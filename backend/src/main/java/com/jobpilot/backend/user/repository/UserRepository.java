@@ -1,5 +1,6 @@
-package com.jobpilot.backend.user;
+package com.jobpilot.backend.user.repository;
 
+import com.jobpilot.backend.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package com.jobpilot.backend.user;
+package com.jobpilot.backend.user.entity;
 
 public enum UserRole {
     USER,

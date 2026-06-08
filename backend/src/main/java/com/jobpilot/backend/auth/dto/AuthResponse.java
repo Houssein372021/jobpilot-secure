@@ -1,4 +1,4 @@
-package com.jobpilot.backend.auth;
+package com.jobpilot.backend.auth.dto;
 
 import java.util.UUID;
 

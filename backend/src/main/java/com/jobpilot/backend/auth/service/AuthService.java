@@ -1,8 +1,10 @@
-package com.jobpilot.backend.auth;
+package com.jobpilot.backend.auth.service;
 
-import com.jobpilot.backend.user.User;
-import com.jobpilot.backend.user.UserRepository;
-import com.jobpilot.backend.user.UserRole;
+import com.jobpilot.backend.auth.dto.AuthResponse;
+import com.jobpilot.backend.auth.dto.RegisterRequest;
+import com.jobpilot.backend.user.entity.User;
+import com.jobpilot.backend.user.entity.UserRole;
+import com.jobpilot.backend.user.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

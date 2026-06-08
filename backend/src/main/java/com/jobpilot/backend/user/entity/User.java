@@ -1,4 +1,4 @@
-package com.jobpilot.backend.user;
+package com.jobpilot.backend.user.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

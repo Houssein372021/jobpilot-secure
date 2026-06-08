@@ -1,5 +1,8 @@
-package com.jobpilot.backend.auth;
+package com.jobpilot.backend.auth.controller;
 
+import com.jobpilot.backend.auth.dto.AuthResponse;
+import com.jobpilot.backend.auth.dto.RegisterRequest;
+import com.jobpilot.backend.auth.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
