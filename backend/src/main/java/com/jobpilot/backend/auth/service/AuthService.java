@@ -3,6 +3,7 @@ package com.jobpilot.backend.auth.service;
 import com.jobpilot.backend.auth.dto.AuthResponse;
 import com.jobpilot.backend.auth.dto.LoginRequest;
 import com.jobpilot.backend.auth.dto.RegisterRequest;
+import com.jobpilot.backend.security.jwt.JwtService;
 import com.jobpilot.backend.user.entity.User;
 import com.jobpilot.backend.user.entity.UserRole;
 import com.jobpilot.backend.user.repository.UserRepository;
@@ -17,13 +18,16 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public AuthService(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -68,7 +72,11 @@ public class AuthService {
     }
 
     private AuthResponse toAuthResponse(User user) {
+        String token = jwtService.generateToken(user);
+
         return new AuthResponse(
+                token,
+                "Bearer",
                 user.getId(),
                 user.getEmail(),
                 user.getFirstName(),
