@@ -5,6 +5,7 @@ import com.jobpilot.backend.auth.dto.RegisterRequest;
 import com.jobpilot.backend.auth.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import com.jobpilot.backend.auth.dto.LoginRequest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,4 +23,12 @@ public class AuthController {
     public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
         return authService.register(request);
     }
+
+    @PostMapping("/login")
+    public AuthResponse login(@Valid @RequestBody LoginRequest request) {
+        return authService.login(request);
+    }
+
+
+    
 }
