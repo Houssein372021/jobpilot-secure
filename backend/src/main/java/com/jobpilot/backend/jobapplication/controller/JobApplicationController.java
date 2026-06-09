@@ -7,6 +7,7 @@ import com.jobpilot.backend.user.entity.User;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,6 +37,14 @@ public class JobApplicationController {
             @AuthenticationPrincipal User user
     ) {
         return jobApplicationService.findAllForUser(user);
+    }
+
+    @GetMapping("/{id}")
+    public JobApplicationResponse findById(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID id
+    ) {
+        return jobApplicationService.findByIdForUser(user, id);
     }
 
 }

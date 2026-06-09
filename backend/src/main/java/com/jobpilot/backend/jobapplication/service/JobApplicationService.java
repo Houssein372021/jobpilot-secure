@@ -59,9 +59,19 @@ public class JobApplicationService {
     }
 
     public List<JobApplicationResponse> findAllForUser(User user) {
-    return jobApplicationRepository.findByUserIdOrderByCreatedAtDesc(user.getId())
-            .stream()
-            .map(this::toResponse)
-            .toList();
-}
+        return jobApplicationRepository.findByUserIdOrderByCreatedAtDesc(user.getId())
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public JobApplicationResponse findByIdForUser(User user, UUID applicationId) {
+        JobApplication jobApplication = jobApplicationRepository
+                .findByIdAndUserId(applicationId, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Candidature introuvable"));
+
+        return toResponse(jobApplication);
+    }
+
+
 }
