@@ -80,6 +80,13 @@ public class JobApplicationController {
         return jobApplicationService.getStats(user);
     }
 
+    @GetMapping("/search")
+    public List<JobApplicationResponse> search(
+            @AuthenticationPrincipal User user,
+            @RequestParam String query
+    ) {
+        return jobApplicationService.search(user, query);
+    }
 
-    
+
 }
