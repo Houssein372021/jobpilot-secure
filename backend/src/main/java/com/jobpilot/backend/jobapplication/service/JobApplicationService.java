@@ -2,6 +2,7 @@ package com.jobpilot.backend.jobapplication.service;
 
 import com.jobpilot.backend.jobapplication.dto.CreateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
+import com.jobpilot.backend.jobapplication.dto.UpdateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.entity.ApplicationStatus;
 import com.jobpilot.backend.jobapplication.entity.JobApplication;
 import com.jobpilot.backend.jobapplication.repository.JobApplicationRepository;
@@ -72,6 +73,56 @@ public class JobApplicationService {
 
         return toResponse(jobApplication);
     }
+
+    public JobApplicationResponse update(
+            User user,
+            UUID applicationId,
+            UpdateJobApplicationRequest request
+    ) {
+        JobApplication jobApplication = jobApplicationRepository
+                .findByIdAndUserId(applicationId, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Candidature introuvable"));
+
+        if (request.companyName() != null) {
+            jobApplication.setCompanyName(request.companyName());
+        }
+
+        if (request.jobTitle() != null) {
+            jobApplication.setJobTitle(request.jobTitle());
+        }
+
+        if (request.location() != null) {
+            jobApplication.setLocation(request.location());
+        }
+
+        if (request.contractType() != null) {
+            jobApplication.setContractType(request.contractType());
+        }
+
+        if (request.status() != null) {
+            jobApplication.setStatus(request.status());
+        }
+
+        if (request.source() != null) {
+            jobApplication.setSource(request.source());
+        }
+
+        if (request.applicationUrl() != null) {
+            jobApplication.setApplicationUrl(request.applicationUrl());
+        }
+
+        if (request.notes() != null) {
+            jobApplication.setNotes(request.notes());
+        }
+
+        jobApplication.setUpdatedAt(LocalDateTime.now());
+
+        JobApplication updatedApplication = jobApplicationRepository.save(jobApplication);
+
+        return toResponse(updatedApplication);
+    }
+
+
 
 
 }

@@ -2,6 +2,7 @@ package com.jobpilot.backend.jobapplication.controller;
 
 import com.jobpilot.backend.jobapplication.dto.CreateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
+import com.jobpilot.backend.jobapplication.dto.UpdateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.service.JobApplicationService;
 import com.jobpilot.backend.user.entity.User;
 import jakarta.validation.Valid;
@@ -46,5 +47,16 @@ public class JobApplicationController {
     ) {
         return jobApplicationService.findByIdForUser(user, id);
     }
+
+    @PutMapping("/{id}")
+    public JobApplicationResponse update(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateJobApplicationRequest request
+    ) {
+        return jobApplicationService.update(user, id, request);
+    }
+
+    
 
 }
