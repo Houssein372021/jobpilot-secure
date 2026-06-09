@@ -2,6 +2,7 @@ package com.jobpilot.backend.jobapplication.controller;
 
 import com.jobpilot.backend.jobapplication.dto.CreateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
+import com.jobpilot.backend.jobapplication.dto.JobApplicationStatsResponse;
 import com.jobpilot.backend.jobapplication.dto.UpdateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.entity.ApplicationStatus;
 import com.jobpilot.backend.jobapplication.service.JobApplicationService;
@@ -72,6 +73,13 @@ public class JobApplicationController {
         return jobApplicationService.findAllForUser(user);
     }
 
+    @GetMapping("/stats")
+    public JobApplicationStatsResponse stats(
+            @AuthenticationPrincipal User user
+    ) {
+        return jobApplicationService.getStats(user);
+    }
 
 
+    
 }

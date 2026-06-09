@@ -19,4 +19,8 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
     );
 
     Optional<JobApplication> findByIdAndUserId(UUID id, UUID userId);
+
+    long countByUserIdAndStatus(UUID userId, ApplicationStatus status);
+
+    
 }

@@ -2,6 +2,7 @@ package com.jobpilot.backend.jobapplication.service;
 
 import com.jobpilot.backend.jobapplication.dto.CreateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
+import com.jobpilot.backend.jobapplication.dto.JobApplicationStatsResponse;
 import com.jobpilot.backend.jobapplication.dto.UpdateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.entity.ApplicationStatus;
 import com.jobpilot.backend.jobapplication.entity.JobApplication;
@@ -141,7 +142,24 @@ public class JobApplicationService {
                 .toList();
     }
 
+    public JobApplicationStatsResponse getStats(User user) {
+        long saved = jobApplicationRepository.countByUserIdAndStatus(user.getId(), ApplicationStatus.SAVED);
+        long applied = jobApplicationRepository.countByUserIdAndStatus(user.getId(), ApplicationStatus.APPLIED);
+        long interview = jobApplicationRepository.countByUserIdAndStatus(user.getId(), ApplicationStatus.INTERVIEW);
+        long offer = jobApplicationRepository.countByUserIdAndStatus(user.getId(), ApplicationStatus.OFFER);
+        long rejected = jobApplicationRepository.countByUserIdAndStatus(user.getId(), ApplicationStatus.REJECTED);
     
+        long total = saved + applied + interview + offer + rejected;
+    
+        return new JobApplicationStatsResponse(
+                total,
+                saved,
+                applied,
+                interview,
+                offer,
+                rejected
+        );
+    }
 
 
 
