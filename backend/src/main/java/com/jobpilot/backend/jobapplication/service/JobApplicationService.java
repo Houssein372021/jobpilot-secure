@@ -162,21 +162,10 @@ public class JobApplicationService {
     }
 
     public List<JobApplicationResponse> search(User user, String query) {
-        return jobApplicationRepository
-                .findByUserIdAndCompanyNameContainingIgnoreCaseOrUserIdAndJobTitleContainingIgnoreCaseOrUserIdAndLocationContainingIgnoreCaseOrUserIdAndSourceContainingIgnoreCaseOrderByCreatedAtDesc(
-                        user.getId(),
-                        query,
-                        user.getId(),
-                        query,
-                        user.getId(),
-                        query,
-                        user.getId(),
-                        query
-                )
-                .stream()
-                .map(this::toResponse)
-                .toList();
-    }
-
+    return jobApplicationRepository.searchForUser(user.getId(), query)
+            .stream()
+            .map(this::toResponse)
+            .toList();
+}
 
 }

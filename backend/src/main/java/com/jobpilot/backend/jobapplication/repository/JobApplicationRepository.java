@@ -3,7 +3,7 @@ package com.jobpilot.backend.jobapplication.repository;
 import com.jobpilot.backend.jobapplication.entity.ApplicationStatus;
 import com.jobpilot.backend.jobapplication.entity.JobApplication;
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,15 +22,20 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
 
     long countByUserIdAndStatus(UUID userId, ApplicationStatus status);
 
-    List<JobApplication> findByUserIdAndCompanyNameContainingIgnoreCaseOrUserIdAndJobTitleContainingIgnoreCaseOrUserIdAndLocationContainingIgnoreCaseOrUserIdAndSourceContainingIgnoreCaseOrderByCreatedAtDesc(
-            UUID userId1,
-            String companyName,
-            UUID userId2,
-            String jobTitle,
-            UUID userId3,
-            String location,
-            UUID userId4,
-            String source
+    @Query("""
+            SELECT j FROM JobApplication j
+            WHERE j.user.id = :userId
+            AND (
+                LOWER(j.companyName) LIKE LOWER(CONCAT('%', :query, '%'))
+                OR LOWER(j.jobTitle) LIKE LOWER(CONCAT('%', :query, '%'))
+                OR LOWER(j.location) LIKE LOWER(CONCAT('%', :query, '%'))
+                OR LOWER(j.source) LIKE LOWER(CONCAT('%', :query, '%'))
+            )
+            ORDER BY j.createdAt DESC
+            """)
+    List<JobApplication> searchForUser(
+            UUID userId,
+            String query
     );
 
 }
