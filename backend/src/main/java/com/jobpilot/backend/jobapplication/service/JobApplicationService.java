@@ -130,6 +130,19 @@ public class JobApplicationService {
         jobApplicationRepository.delete(jobApplication);
     }
 
+    public List<JobApplicationResponse> findAllForUserByStatus(
+            User user,
+            ApplicationStatus status
+    ) {
+        return jobApplicationRepository
+                .findByUserIdAndStatusOrderByCreatedAtDesc(user.getId(), status)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
     
+
+
 
 }

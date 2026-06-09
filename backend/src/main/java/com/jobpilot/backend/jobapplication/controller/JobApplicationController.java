@@ -3,6 +3,7 @@ package com.jobpilot.backend.jobapplication.controller;
 import com.jobpilot.backend.jobapplication.dto.CreateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
 import com.jobpilot.backend.jobapplication.dto.UpdateJobApplicationRequest;
+import com.jobpilot.backend.jobapplication.entity.ApplicationStatus;
 import com.jobpilot.backend.jobapplication.service.JobApplicationService;
 import com.jobpilot.backend.user.entity.User;
 import jakarta.validation.Valid;
@@ -33,13 +34,6 @@ public class JobApplicationController {
         return jobApplicationService.create(user, request);
     }
 
-    @GetMapping
-    public List<JobApplicationResponse> findAll(
-            @AuthenticationPrincipal User user
-    ) {
-        return jobApplicationService.findAllForUser(user);
-    }
-
     @GetMapping("/{id}")
     public JobApplicationResponse findById(
             @AuthenticationPrincipal User user,
@@ -65,5 +59,19 @@ public class JobApplicationController {
     ) {
         jobApplicationService.delete(user, id);
     }
+
+    @GetMapping
+    public List<JobApplicationResponse> findAll(
+            @AuthenticationPrincipal User user,
+            @RequestParam(required = false) ApplicationStatus status
+    ) {
+        if (status != null) {
+            return jobApplicationService.findAllForUserByStatus(user, status);
+        }
+    
+        return jobApplicationService.findAllForUser(user);
+    }
+
+
 
 }
