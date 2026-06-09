@@ -5,6 +5,9 @@ import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
 import com.jobpilot.backend.jobapplication.service.JobApplicationService;
 import com.jobpilot.backend.user.entity.User;
 import jakarta.validation.Valid;
+
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -27,4 +30,12 @@ public class JobApplicationController {
     ) {
         return jobApplicationService.create(user, request);
     }
+
+    @GetMapping
+    public List<JobApplicationResponse> findAll(
+            @AuthenticationPrincipal User user
+    ) {
+        return jobApplicationService.findAllForUser(user);
+    }
+
 }

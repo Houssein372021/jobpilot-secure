@@ -9,6 +9,7 @@ import com.jobpilot.backend.user.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -56,4 +57,11 @@ public class JobApplicationService {
                 jobApplication.getUpdatedAt()
         );
     }
+
+    public List<JobApplicationResponse> findAllForUser(User user) {
+    return jobApplicationRepository.findByUserIdOrderByCreatedAtDesc(user.getId())
+            .stream()
+            .map(this::toResponse)
+            .toList();
+}
 }
