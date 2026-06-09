@@ -122,7 +122,14 @@ public class JobApplicationService {
         return toResponse(updatedApplication);
     }
 
+    public void delete(User user, UUID applicationId) {
+        JobApplication jobApplication = jobApplicationRepository
+                .findByIdAndUserId(applicationId, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Candidature introuvable"));
 
+        jobApplicationRepository.delete(jobApplication);
+    }
 
+    
 
 }

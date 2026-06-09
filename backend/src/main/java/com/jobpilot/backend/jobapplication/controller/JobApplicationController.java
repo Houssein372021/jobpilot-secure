@@ -57,6 +57,13 @@ public class JobApplicationController {
         return jobApplicationService.update(user, id, request);
     }
 
-    
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID id
+    ) {
+        jobApplicationService.delete(user, id);
+    }
 
 }
