@@ -7,6 +7,7 @@ import com.jobpilot.backend.jobapplication.entity.JobApplication;
 import com.jobpilot.backend.jobapplication.repository.JobApplicationRepository;
 import com.jobpilot.backend.user.entity.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
@@ -72,5 +73,18 @@ public class DashboardService {
                 jobApplication.getUpdatedAt(),
                 jobApplication.getFollowUpAt(),
                 jobApplication.isFavorite());
+    }
+
+    public List<JobApplicationResponse> getUpcomingFollowUps(User user) {
+        PageRequest pageRequest = PageRequest.of(
+                0,
+                5);
+
+        return jobApplicationRepository
+                .findUpcomingFollowUpsForUser(user.getId(), LocalDateTime.now(), pageRequest)
+                .getContent()
+                .stream()
+                .map(this::toJobApplicationResponse)
+                .toList();
     }
 }

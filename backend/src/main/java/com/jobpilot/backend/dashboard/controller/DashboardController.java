@@ -33,4 +33,10 @@ public class DashboardController {
             @AuthenticationPrincipal User user) {
         return dashboardService.getRecentApplications(user);
     }
+
+    @GetMapping("/upcoming-follow-ups")
+    public List<JobApplicationResponse> getUpcomingFollowUps(
+            @AuthenticationPrincipal User user) {
+        return dashboardService.getUpcomingFollowUps(user);
+    }
 }
