@@ -14,7 +14,6 @@ import com.jobpilot.backend.user.entity.User;
 import jakarta.validation.Valid;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.PageRequest;
@@ -28,17 +27,6 @@ import org.springframework.web.bind.annotation.*;
 public class JobApplicationController {
 
     private final JobApplicationService jobApplicationService;
-
-    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(
-            "companyName",
-            "jobTitle",
-            "location",
-            "contractType",
-            "status",
-            "favorite",
-            "appliedAt",
-            "createdAt",
-            "updatedAt");
 
     public JobApplicationController(JobApplicationService jobApplicationService) {
         this.jobApplicationService = jobApplicationService;

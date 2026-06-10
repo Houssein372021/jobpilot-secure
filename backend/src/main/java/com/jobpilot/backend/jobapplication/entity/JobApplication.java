@@ -188,4 +188,8 @@ public class JobApplication {
         this.favorite = favorite;
     }
 
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

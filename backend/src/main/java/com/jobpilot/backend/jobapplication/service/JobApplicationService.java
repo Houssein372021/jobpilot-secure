@@ -127,8 +127,6 @@ public class JobApplicationService {
             jobApplication.setFavorite(request.favorite());
         }
 
-        jobApplication.setUpdatedAt(LocalDateTime.now());
-
         JobApplication updatedApplication = jobApplicationRepository.save(jobApplication);
 
         return toResponse(updatedApplication);
@@ -193,8 +191,6 @@ public class JobApplicationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable"));
 
         updateStatusAndAppliedDate(jobApplication, request.status());
-
-        jobApplication.setUpdatedAt(LocalDateTime.now());
 
         JobApplication updatedApplication = jobApplicationRepository.save(jobApplication);
 
@@ -261,7 +257,6 @@ public class JobApplicationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable"));
 
         jobApplication.setFavorite(request.favorite());
-        jobApplication.setUpdatedAt(LocalDateTime.now());
 
         JobApplication updatedApplication = jobApplicationRepository.save(jobApplication);
 
