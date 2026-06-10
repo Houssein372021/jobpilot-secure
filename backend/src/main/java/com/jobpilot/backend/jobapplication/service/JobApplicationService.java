@@ -1,5 +1,6 @@
 package com.jobpilot.backend.jobapplication.service;
 
+import com.jobpilot.backend.common.dto.PagedResponse;
 import com.jobpilot.backend.jobapplication.dto.CreateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationStatsResponse;
@@ -8,6 +9,9 @@ import com.jobpilot.backend.jobapplication.entity.ApplicationStatus;
 import com.jobpilot.backend.jobapplication.entity.JobApplication;
 import com.jobpilot.backend.jobapplication.repository.JobApplicationRepository;
 import com.jobpilot.backend.user.entity.User;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -60,11 +64,23 @@ public class JobApplicationService {
         );
     }
 
-    public List<JobApplicationResponse> findAllForUser(User user) {
-        return jobApplicationRepository.findByUserIdOrderByCreatedAtDesc(user.getId())
-                .stream()
-                .map(this::toResponse)
-                .toList();
+    public PagedResponse<JobApplicationResponse> findAllForUser(
+            User user,
+            Pageable pageable
+    ) {
+        Page<JobApplication> page = jobApplicationRepository.findByUserId(user.getId(), pageable);
+    
+        return new PagedResponse<>(
+                page.getContent()
+                        .stream()
+                        .map(this::toResponse)
+                        .toList(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast()
+        );
     }
 
     public JobApplicationResponse findByIdForUser(User user, UUID applicationId) {
@@ -131,15 +147,25 @@ public class JobApplicationService {
         jobApplicationRepository.delete(jobApplication);
     }
 
-    public List<JobApplicationResponse> findAllForUserByStatus(
+    public PagedResponse<JobApplicationResponse> findAllForUserByStatus(
             User user,
-            ApplicationStatus status
+            ApplicationStatus status,
+            Pageable pageable
     ) {
-        return jobApplicationRepository
-                .findByUserIdAndStatusOrderByCreatedAtDesc(user.getId(), status)
-                .stream()
-                .map(this::toResponse)
-                .toList();
+        Page<JobApplication> page = jobApplicationRepository
+                .findByUserIdAndStatus(user.getId(), status, pageable);
+
+        return new PagedResponse<>(
+                page.getContent()
+                        .stream()
+                        .map(this::toResponse)
+                        .toList(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast()
+        );
     }
 
     public JobApplicationStatsResponse getStats(User user) {

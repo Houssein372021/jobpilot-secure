@@ -2,6 +2,9 @@ package com.jobpilot.backend.jobapplication.repository;
 
 import com.jobpilot.backend.jobapplication.entity.ApplicationStatus;
 import com.jobpilot.backend.jobapplication.entity.JobApplication;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -11,12 +14,13 @@ import java.util.UUID;
 
 public interface JobApplicationRepository extends JpaRepository<JobApplication, UUID> {
 
-    List<JobApplication> findByUserIdOrderByCreatedAtDesc(UUID userId);
+    Page<JobApplication> findByUserId(UUID userId, Pageable pageable);
 
-    List<JobApplication> findByUserIdAndStatusOrderByCreatedAtDesc(
-            UUID userId,
-            ApplicationStatus status
-    );
+    Page<JobApplication> findByUserIdAndStatus(
+                UUID userId,
+                ApplicationStatus status,
+                Pageable pageable
+        );
 
     Optional<JobApplication> findByIdAndUserId(UUID id, UUID userId);
 

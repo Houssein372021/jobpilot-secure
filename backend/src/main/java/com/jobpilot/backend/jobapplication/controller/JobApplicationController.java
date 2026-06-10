@@ -1,5 +1,6 @@
 package com.jobpilot.backend.jobapplication.controller;
 
+import com.jobpilot.backend.common.dto.PagedResponse;
 import com.jobpilot.backend.jobapplication.dto.CreateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationStatsResponse;
@@ -12,6 +13,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -62,15 +65,23 @@ public class JobApplicationController {
     }
 
     @GetMapping
-    public List<JobApplicationResponse> findAll(
+    public PagedResponse<JobApplicationResponse> findAll(
             @AuthenticationPrincipal User user,
-            @RequestParam(required = false) ApplicationStatus status
+            @RequestParam(required = false) ApplicationStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
+        PageRequest pageRequest = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+    
         if (status != null) {
-            return jobApplicationService.findAllForUserByStatus(user, status);
+            return jobApplicationService.findAllForUserByStatus(user, status, pageRequest);
         }
     
-        return jobApplicationService.findAllForUser(user);
+        return jobApplicationService.findAllForUser(user, pageRequest);
     }
 
     @GetMapping("/stats")
