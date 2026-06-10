@@ -86,8 +86,6 @@ public class JobApplicationController {
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String direction) {
 
-        String safeSortBy = normalizeSortBy(sortBy);
-
         Sort.Direction sortDirection = direction.equalsIgnoreCase("asc")
                 ? Sort.Direction.ASC
                 : Sort.Direction.DESC;
@@ -95,7 +93,7 @@ public class JobApplicationController {
         PageRequest pageRequest = PageRequest.of(
                 PaginationUtils.normalizePage(page),
                 PaginationUtils.normalizeSize(size),
-                Sort.by(sortDirection, sortBy));
+                Sort.by(sortDirection, normalizeSortBy(sortBy)));
 
         return jobApplicationService.findAllForUserWithFilters(
                 user,
@@ -156,14 +154,9 @@ public class JobApplicationController {
     }
 
     private String normalizeSortBy(String sortBy) {
-        if (sortBy == null || sortBy.isBlank()) {
-            return "createdAt";
-        }
-
-        if (!ALLOWED_SORT_FIELDS.contains(sortBy)) {
-            return "createdAt";
-        }
-
-        return sortBy;
+        return switch (sortBy) {
+            case "createdAt", "updatedAt", "companyName", "jobTitle", "status", "favorite" -> sortBy;
+            default -> "createdAt";
+        };
     }
 }
