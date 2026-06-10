@@ -84,18 +84,18 @@ public class JobApplicationController {
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDir) {
+            @RequestParam(defaultValue = "desc") String direction) {
 
         String safeSortBy = normalizeSortBy(sortBy);
 
-        Sort.Direction direction = "asc".equalsIgnoreCase(sortDir)
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("asc")
                 ? Sort.Direction.ASC
                 : Sort.Direction.DESC;
 
         PageRequest pageRequest = PageRequest.of(
                 PaginationUtils.normalizePage(page),
                 PaginationUtils.normalizeSize(size),
-                Sort.by(direction, safeSortBy));
+                Sort.by(sortDirection, sortBy));
 
         return jobApplicationService.findAllForUserWithFilters(
                 user,
