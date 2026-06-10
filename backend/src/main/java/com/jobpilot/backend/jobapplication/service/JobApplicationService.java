@@ -267,6 +267,14 @@ public class JobApplicationService {
     }
 
     public List<JobApplicationResponse> createDemoApplications(User user) {
+        boolean hasDemoApplications = jobApplicationRepository
+                .findByUserId(user.getId(), Pageable.unpaged())
+                .stream()
+                .anyMatch(application -> "Demo".equals(application.getSource()));
+
+        if (hasDemoApplications) {
+            throw new IllegalArgumentException("Les candidatures de démonstration existent déjà");
+        }
         List<JobApplication> applications = List.of(
                 buildDemoApplication(user, "Capgemini", "Java Developer", "Nantes", "CDI", ApplicationStatus.APPLIED),
                 buildDemoApplication(user, "Sopra Steria", "Backend Developer", "Nantes", "CDI",
