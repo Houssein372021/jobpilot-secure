@@ -329,10 +329,7 @@ public class JobApplicationService {
             String search,
             Pageable pageable) {
         Page<JobApplication> page = jobApplicationRepository
-                .findByUserIdAndCompanyNameContainingIgnoreCase(
-                        user.getId(),
-                        search,
-                        pageable);
+                .searchForUser(user.getId(), search, pageable);
 
         return toPagedResponse(page);
     }
