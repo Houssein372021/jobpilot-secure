@@ -333,4 +333,20 @@ public class JobApplicationService {
 
         return toPagedResponse(page);
     }
+
+    public PagedResponse<JobApplicationResponse> findAllForUserWithFilters(
+            User user,
+            ApplicationStatus status,
+            Boolean favorite,
+            String search,
+            Pageable pageable) {
+        Page<JobApplication> page = jobApplicationRepository.findAllForUserWithFilters(
+                user.getId(),
+                status,
+                favorite,
+                search,
+                pageable);
+
+        return toPagedResponse(page);
+    }
 }

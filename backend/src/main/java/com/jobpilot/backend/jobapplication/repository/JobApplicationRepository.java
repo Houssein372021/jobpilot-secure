@@ -58,4 +58,29 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
 
     long countByUserIdAndFavorite(UUID userId, boolean favorite);
 
+    @Query("""
+            SELECT j FROM JobApplication j
+            WHERE j.user.id = :userId
+            AND (
+                :status IS NULL OR j.status = :status
+            )
+            AND (
+                :favorite IS NULL OR j.favorite = :favorite
+            )
+            AND (
+                :search IS NULL
+                OR :search = ''
+                OR LOWER(j.companyName) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(j.jobTitle) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(j.location) LIKE LOWER(CONCAT('%', :search, '%'))
+                OR LOWER(j.notes) LIKE LOWER(CONCAT('%', :search, '%'))
+            )
+            """)
+    Page<JobApplication> findAllForUserWithFilters(
+            @Param("userId") UUID userId,
+            @Param("status") ApplicationStatus status,
+            @Param("favorite") Boolean favorite,
+            @Param("search") String search,
+            Pageable pageable);
+
 }
