@@ -114,11 +114,7 @@ public class JobApplicationService {
         }
 
         if (request.status() != null) {
-            jobApplication.setStatus(request.status());
-
-            if (request.status() == ApplicationStatus.APPLIED && jobApplication.getAppliedAt() == null) {
-                jobApplication.setAppliedAt(LocalDateTime.now());
-            }
+            updateStatusAndAppliedDate(jobApplication, request.status());
         }
 
         if (request.source() != null) {
@@ -216,15 +212,23 @@ public class JobApplicationService {
 
         jobApplication.setStatus(request.status());
 
-        if (request.status() == ApplicationStatus.APPLIED && jobApplication.getAppliedAt() == null) {
-            jobApplication.setAppliedAt(LocalDateTime.now());
-        }
+        updateStatusAndAppliedDate(jobApplication, request.status());
 
         jobApplication.setUpdatedAt(LocalDateTime.now());
 
         JobApplication updatedApplication = jobApplicationRepository.save(jobApplication);
 
         return toResponse(updatedApplication);
+    }
+
+    private void updateStatusAndAppliedDate(
+            JobApplication jobApplication,
+            ApplicationStatus status) {
+        jobApplication.setStatus(status);
+
+        if (status == ApplicationStatus.APPLIED && jobApplication.getAppliedAt() == null) {
+            jobApplication.setAppliedAt(LocalDateTime.now());
+        }
     }
 
 }
