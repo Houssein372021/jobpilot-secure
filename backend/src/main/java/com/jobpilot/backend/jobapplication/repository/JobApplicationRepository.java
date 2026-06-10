@@ -58,8 +58,4 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
 
     long countByUserIdAndFavorite(UUID userId, boolean favorite);
 
-    Page<JobApplication> findByUserIdAndCompanyNameContainingIgnoreCase(
-            UUID userId,
-            String companyName,
-            Pageable pageable);
 }
