@@ -14,7 +14,6 @@ import com.jobpilot.backend.user.entity.User;
 import jakarta.validation.Valid;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.PageRequest;
@@ -28,17 +27,6 @@ import org.springframework.web.bind.annotation.*;
 public class JobApplicationController {
 
     private final JobApplicationService jobApplicationService;
-
-    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(
-            "companyName",
-            "jobTitle",
-            "location",
-            "contractType",
-            "status",
-            "favorite",
-            "appliedAt",
-            "createdAt",
-            "updatedAt");
 
     public JobApplicationController(JobApplicationService jobApplicationService) {
         this.jobApplicationService = jobApplicationService;
@@ -82,20 +70,11 @@ public class JobApplicationController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(required = false) Boolean favorite,
             @RequestParam(required = false) String search,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDir) {
-
-        String safeSortBy = normalizeSortBy(sortBy);
-
-        Sort.Direction direction = "asc".equalsIgnoreCase(sortDir)
-                ? Sort.Direction.ASC
-                : Sort.Direction.DESC;
-
+            @RequestParam(defaultValue = "10") int size) {
         PageRequest pageRequest = PageRequest.of(
                 PaginationUtils.normalizePage(page),
                 PaginationUtils.normalizeSize(size),
-                Sort.by(direction, safeSortBy));
+                Sort.by(Sort.Direction.DESC, "createdAt"));
 
         return jobApplicationService.findAllForUserWithFilters(
                 user,
@@ -103,6 +82,7 @@ public class JobApplicationController {
                 favorite,
                 search,
                 pageRequest);
+
     }
 
     @GetMapping("/stats")
@@ -153,17 +133,5 @@ public class JobApplicationController {
     public void deleteDemoApplications(
             @AuthenticationPrincipal User user) {
         jobApplicationService.deleteDemoApplications(user);
-    }
-
-    private String normalizeSortBy(String sortBy) {
-        if (sortBy == null || sortBy.isBlank()) {
-            return "createdAt";
-        }
-
-        if (!ALLOWED_SORT_FIELDS.contains(sortBy)) {
-            return "createdAt";
-        }
-
-        return sortBy;
     }
 }
