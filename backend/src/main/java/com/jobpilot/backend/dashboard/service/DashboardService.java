@@ -70,6 +70,7 @@ public class DashboardService {
                 jobApplication.getAppliedAt(),
                 jobApplication.getCreatedAt(),
                 jobApplication.getUpdatedAt(),
+                jobApplication.getFollowUpAt(),
                 jobApplication.isFavorite());
     }
 }

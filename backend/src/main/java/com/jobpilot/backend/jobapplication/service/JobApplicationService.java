@@ -42,8 +42,8 @@ public class JobApplicationService {
         jobApplication.setStatus(ApplicationStatus.SAVED);
         jobApplication.setSource(request.source());
         jobApplication.setApplicationUrl(request.applicationUrl());
+        jobApplication.setFollowUpAt(request.followUpAt());
         jobApplication.setNotes(request.notes());
-        
 
         JobApplication savedApplication = jobApplicationRepository.save(jobApplication);
 
@@ -64,6 +64,7 @@ public class JobApplicationService {
                 jobApplication.getAppliedAt(),
                 jobApplication.getCreatedAt(),
                 jobApplication.getUpdatedAt(),
+                jobApplication.getFollowUpAt(),
                 jobApplication.isFavorite());
     }
 
@@ -93,6 +94,10 @@ public class JobApplicationService {
 
         if (request.companyName() != null) {
             jobApplication.setCompanyName(request.companyName());
+        }
+
+        if (request.followUpAt() != null) {
+            jobApplication.setFollowUpAt(request.followUpAt());
         }
 
         if (request.jobTitle() != null) {
@@ -303,7 +308,6 @@ public class JobApplicationService {
         jobApplication.setSource("Demo");
         jobApplication.setNotes("Candidature de démonstration");
         jobApplication.setFavorite(false);
-        
 
         if (status == ApplicationStatus.APPLIED) {
             jobApplication.setAppliedAt(LocalDateTime.now());

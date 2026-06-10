@@ -54,6 +54,9 @@ public class JobApplication {
     @Column(nullable = false)
     private boolean favorite = false;
 
+    @Column(name = "follow_up_at")
+    private LocalDateTime followUpAt;
+
     public JobApplication() {
     }
 
@@ -74,6 +77,7 @@ public class JobApplication {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.favorite = false;
+        this.followUpAt = null;
     }
 
     public UUID getId() {
@@ -196,5 +200,13 @@ public class JobApplication {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    public LocalDateTime getFollowUpAt() {
+        return followUpAt;
+    }
+
+    public void setFollowUpAt(LocalDateTime followUpAt) {
+        this.followUpAt = followUpAt;
     }
 }
