@@ -87,4 +87,17 @@ public class DashboardService {
                 .map(this::toJobApplicationResponse)
                 .toList();
     }
+
+    public List<JobApplicationResponse> getOverdueFollowUps(User user) {
+        PageRequest pageRequest = PageRequest.of(
+                0,
+                5);
+
+        return jobApplicationRepository
+                .findOverdueFollowUpsForUser(user.getId(), LocalDateTime.now(), pageRequest)
+                .getContent()
+                .stream()
+                .map(this::toJobApplicationResponse)
+                .toList();
+    }
 }

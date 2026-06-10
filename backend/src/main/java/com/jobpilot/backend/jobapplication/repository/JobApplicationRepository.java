@@ -98,4 +98,16 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
             @Param("now") LocalDateTime now,
             Pageable pageable);
 
+    @Query("""
+            SELECT j FROM JobApplication j
+            WHERE j.user.id = :userId
+            AND j.followUpAt IS NOT NULL
+            AND j.followUpAt < :now
+            ORDER BY j.followUpAt ASC
+            """)
+    Page<JobApplication> findOverdueFollowUpsForUser(
+            @Param("userId") UUID userId,
+            @Param("now") LocalDateTime now,
+            Pageable pageable);
+
 }
