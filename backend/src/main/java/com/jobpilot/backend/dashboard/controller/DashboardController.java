@@ -45,4 +45,10 @@ public class DashboardController {
             @AuthenticationPrincipal User user) {
         return dashboardService.getOverdueFollowUps(user);
     }
+
+    @GetMapping("/today-follow-ups")
+    public List<JobApplicationResponse> getTodayFollowUps(
+            @AuthenticationPrincipal User user) {
+        return dashboardService.getTodayFollowUps(user);
+    }
 }

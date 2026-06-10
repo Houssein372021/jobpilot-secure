@@ -7,6 +7,7 @@ import com.jobpilot.backend.jobapplication.entity.JobApplication;
 import com.jobpilot.backend.jobapplication.repository.JobApplicationRepository;
 import com.jobpilot.backend.user.entity.User;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -95,6 +96,22 @@ public class DashboardService {
 
         return jobApplicationRepository
                 .findOverdueFollowUpsForUser(user.getId(), LocalDateTime.now(), pageRequest)
+                .getContent()
+                .stream()
+                .map(this::toJobApplicationResponse)
+                .toList();
+    }
+
+    public List<JobApplicationResponse> getTodayFollowUps(User user) {
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        PageRequest pageRequest = PageRequest.of(
+                0,
+                5);
+
+        return jobApplicationRepository
+                .findTodayFollowUpsForUser(user.getId(), startOfDay, endOfDay, pageRequest)
                 .getContent()
                 .stream()
                 .map(this::toJobApplicationResponse)
