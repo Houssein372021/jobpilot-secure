@@ -156,4 +156,16 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
             @Param("userId") UUID userId,
             @Param("now") LocalDateTime now);
 
+    @Query("""
+            SELECT j FROM JobApplication j
+            WHERE j.user.id = :userId
+            AND j.followUpAt IS NULL
+            AND j.status NOT IN :excludedStatuses
+            ORDER BY j.createdAt DESC
+            """)
+    Page<JobApplication> findApplicationsWithoutFollowUpForUser(
+            @Param("userId") UUID userId,
+            @Param("excludedStatuses") List<ApplicationStatus> excludedStatuses,
+            Pageable pageable);
+
 }

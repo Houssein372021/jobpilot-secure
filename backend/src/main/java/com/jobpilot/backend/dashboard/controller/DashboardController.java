@@ -58,4 +58,10 @@ public class DashboardController {
             @AuthenticationPrincipal User user) {
         return dashboardService.getActionSummary(user);
     }
+
+    @GetMapping("/applications-without-follow-up")
+    public List<JobApplicationResponse> getApplicationsWithoutFollowUp(
+            @AuthenticationPrincipal User user) {
+        return dashboardService.getApplicationsWithoutFollowUp(user);
+    }
 }

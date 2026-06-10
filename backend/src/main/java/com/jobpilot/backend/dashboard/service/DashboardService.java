@@ -152,4 +152,21 @@ public class DashboardService {
                 savedApplications,
                 interviewApplications);
     }
+
+    public List<JobApplicationResponse> getApplicationsWithoutFollowUp(User user) {
+        PageRequest pageRequest = PageRequest.of(
+                0,
+                5);
+
+        List<ApplicationStatus> excludedStatuses = List.of(
+                ApplicationStatus.REJECTED,
+                ApplicationStatus.WITHDRAWN);
+
+        return jobApplicationRepository
+                .findApplicationsWithoutFollowUpForUser(user.getId(), excludedStatuses, pageRequest)
+                .getContent()
+                .stream()
+                .map(this::toJobApplicationResponse)
+                .toList();
+    }
 }
