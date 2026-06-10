@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,5 +51,9 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
                         ApplicationStatus status,
                         boolean favorite,
                         Pageable pageable);
+
+        List<JobApplication> findByUserIdAndSource(
+                        UUID userId,
+                        String source);
 
 }

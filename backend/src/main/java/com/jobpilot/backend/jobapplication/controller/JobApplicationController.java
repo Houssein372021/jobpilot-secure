@@ -134,4 +134,10 @@ public class JobApplicationController {
         return jobApplicationService.createDemoApplications(user);
     }
 
+    @DeleteMapping("/demo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteDemoApplications(
+            @AuthenticationPrincipal User user) {
+        jobApplicationService.deleteDemoApplications(user);
+    }
 }

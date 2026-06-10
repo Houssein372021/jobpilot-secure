@@ -315,4 +315,11 @@ public class JobApplicationService {
         return jobApplication;
     }
 
+    public void deleteDemoApplications(User user) {
+        List<JobApplication> demoApplications = jobApplicationRepository
+                .findByUserIdAndSource(user.getId(), "Demo");
+
+        jobApplicationRepository.deleteAll(demoApplications);
+    }
+
 }
