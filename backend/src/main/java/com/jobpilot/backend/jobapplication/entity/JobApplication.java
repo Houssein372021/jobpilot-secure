@@ -192,4 +192,9 @@ public class JobApplication {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

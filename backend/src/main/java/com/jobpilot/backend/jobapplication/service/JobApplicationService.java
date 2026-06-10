@@ -43,7 +43,7 @@ public class JobApplicationService {
         jobApplication.setSource(request.source());
         jobApplication.setApplicationUrl(request.applicationUrl());
         jobApplication.setNotes(request.notes());
-        jobApplication.setCreatedAt(LocalDateTime.now());
+        
 
         JobApplication savedApplication = jobApplicationRepository.save(jobApplication);
 
@@ -303,7 +303,7 @@ public class JobApplicationService {
         jobApplication.setSource("Demo");
         jobApplication.setNotes("Candidature de démonstration");
         jobApplication.setFavorite(false);
-        jobApplication.setCreatedAt(LocalDateTime.now());
+        
 
         if (status == ApplicationStatus.APPLIED) {
             jobApplication.setAppliedAt(LocalDateTime.now());
