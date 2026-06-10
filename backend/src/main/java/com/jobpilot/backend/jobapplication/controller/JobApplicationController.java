@@ -6,6 +6,7 @@ import com.jobpilot.backend.jobapplication.dto.CreateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationStatsResponse;
 import com.jobpilot.backend.jobapplication.dto.UpdateApplicationStatusRequest;
+import com.jobpilot.backend.jobapplication.dto.UpdateFavoriteRequest;
 import com.jobpilot.backend.jobapplication.dto.UpdateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.entity.ApplicationStatus;
 import com.jobpilot.backend.jobapplication.service.JobApplicationService;
@@ -115,6 +116,14 @@ public class JobApplicationController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdateApplicationStatusRequest request) {
         return jobApplicationService.updateStatus(user, id, request);
+    }
+
+    @PatchMapping("/{id}/favorite")
+    public JobApplicationResponse updateFavorite(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateFavoriteRequest request) {
+        return jobApplicationService.updateFavorite(user, id, request);
     }
 
 }
