@@ -70,16 +70,7 @@ public class JobApplicationService {
             Pageable pageable) {
         Page<JobApplication> page = jobApplicationRepository.findByUserId(user.getId(), pageable);
 
-        return new PagedResponse<>(
-                page.getContent()
-                        .stream()
-                        .map(this::toResponse)
-                        .toList(),
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements(),
-                page.getTotalPages(),
-                page.isLast());
+        return toPagedResponse(page);
     }
 
     public JobApplicationResponse findByIdForUser(User user, UUID applicationId) {
@@ -156,16 +147,7 @@ public class JobApplicationService {
         Page<JobApplication> page = jobApplicationRepository
                 .findByUserIdAndStatus(user.getId(), status, pageable);
 
-        return new PagedResponse<>(
-                page.getContent()
-                        .stream()
-                        .map(this::toResponse)
-                        .toList(),
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements(),
-                page.getTotalPages(),
-                page.isLast());
+        return toPagedResponse(page);
     }
 
     public JobApplicationStatsResponse getStats(User user) {
@@ -195,16 +177,7 @@ public class JobApplicationService {
         Page<JobApplication> page = jobApplicationRepository
                 .searchForUser(user.getId(), query, pageable);
 
-        return new PagedResponse<>(
-                page.getContent()
-                        .stream()
-                        .map(this::toResponse)
-                        .toList(),
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements(),
-                page.getTotalPages(),
-                page.isLast());
+        return toPagedResponse(page);
     }
 
     public JobApplicationResponse updateStatus(
@@ -241,4 +214,37 @@ public class JobApplicationService {
         }
     }
 
+    public PagedResponse<JobApplicationResponse> findAllForUserByFavorite(
+            User user,
+            boolean favorite,
+            Pageable pageable) {
+        Page<JobApplication> page = jobApplicationRepository
+                .findByUserIdAndFavorite(user.getId(), favorite, pageable);
+
+        return toPagedResponse(page);
+    }
+
+    public PagedResponse<JobApplicationResponse> findAllForUserByStatusAndFavorite(
+            User user,
+            ApplicationStatus status,
+            boolean favorite,
+            Pageable pageable) {
+        Page<JobApplication> page = jobApplicationRepository
+                .findByUserIdAndStatusAndFavorite(user.getId(), status, favorite, pageable);
+
+        return toPagedResponse(page);
+    }
+
+    private PagedResponse<JobApplicationResponse> toPagedResponse(Page<JobApplication> page) {
+        return new PagedResponse<>(
+                page.getContent()
+                        .stream()
+                        .map(this::toResponse)
+                        .toList(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast());
+    }
 }

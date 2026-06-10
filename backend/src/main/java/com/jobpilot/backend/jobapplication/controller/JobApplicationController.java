@@ -66,17 +66,27 @@ public class JobApplicationController {
             @AuthenticationPrincipal User user,
             @RequestParam(required = false) ApplicationStatus status,
             @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) Boolean favorite,
             @RequestParam(defaultValue = "10") int size) {
         PageRequest pageRequest = PageRequest.of(
                 PaginationUtils.normalizePage(page),
                 PaginationUtils.normalizeSize(size),
                 Sort.by(Sort.Direction.DESC, "createdAt"));
 
+        if (status != null && favorite != null) {
+            return jobApplicationService.findAllForUserByStatusAndFavorite(user, status, favorite, pageRequest);
+        }
+
         if (status != null) {
             return jobApplicationService.findAllForUserByStatus(user, status, pageRequest);
         }
 
+        if (favorite != null) {
+            return jobApplicationService.findAllForUserByFavorite(user, favorite, pageRequest);
+        }
+
         return jobApplicationService.findAllForUser(user, pageRequest);
+
     }
 
     @GetMapping("/stats")
