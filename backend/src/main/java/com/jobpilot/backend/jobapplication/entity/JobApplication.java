@@ -51,6 +51,9 @@ public class JobApplication {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false)
+    private boolean favorite = false;
+
     public JobApplication() {
     }
 
@@ -70,6 +73,7 @@ public class JobApplication {
         this.appliedAt = appliedAt;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.favorite = false;
     }
 
     public UUID getId() {
@@ -174,6 +178,14 @@ public class JobApplication {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
     }
 
 }

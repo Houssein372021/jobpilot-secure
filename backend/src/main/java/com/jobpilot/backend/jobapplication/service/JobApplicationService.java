@@ -61,7 +61,8 @@ public class JobApplicationService {
                 jobApplication.getNotes(),
                 jobApplication.getAppliedAt(),
                 jobApplication.getCreatedAt(),
-                jobApplication.getUpdatedAt());
+                jobApplication.getUpdatedAt(),
+                jobApplication.isFavorite());
     }
 
     public PagedResponse<JobApplicationResponse> findAllForUser(
@@ -127,6 +128,10 @@ public class JobApplicationService {
 
         if (request.notes() != null) {
             jobApplication.setNotes(request.notes());
+        }
+
+        if (request.favorite() != null) {
+            jobApplication.setFavorite(request.favorite());
         }
 
         jobApplication.setUpdatedAt(LocalDateTime.now());
