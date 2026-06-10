@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -264,4 +265,46 @@ public class JobApplicationService {
 
         return toResponse(updatedApplication);
     }
+
+    public List<JobApplicationResponse> createDemoApplications(User user) {
+        List<JobApplication> applications = List.of(
+                buildDemoApplication(user, "Capgemini", "Java Developer", "Nantes", "CDI", ApplicationStatus.APPLIED),
+                buildDemoApplication(user, "Sopra Steria", "Backend Developer", "Nantes", "CDI",
+                        ApplicationStatus.INTERVIEW),
+                buildDemoApplication(user, "Orange", "Full Stack Developer", "Remote", "CDI", ApplicationStatus.SAVED));
+
+        return jobApplicationRepository.saveAll(applications)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    private JobApplication buildDemoApplication(
+            User user,
+            String companyName,
+            String jobTitle,
+            String location,
+            String contractType,
+            ApplicationStatus status) {
+        JobApplication jobApplication = new JobApplication();
+
+        jobApplication.setId(UUID.randomUUID());
+        jobApplication.setUser(user);
+        jobApplication.setCompanyName(companyName);
+        jobApplication.setJobTitle(jobTitle);
+        jobApplication.setLocation(location);
+        jobApplication.setContractType(contractType);
+        jobApplication.setStatus(status);
+        jobApplication.setSource("Demo");
+        jobApplication.setNotes("Candidature de démonstration");
+        jobApplication.setFavorite(false);
+        jobApplication.setCreatedAt(LocalDateTime.now());
+
+        if (status == ApplicationStatus.APPLIED) {
+            jobApplication.setAppliedAt(LocalDateTime.now());
+        }
+
+        return jobApplication;
+    }
+
 }

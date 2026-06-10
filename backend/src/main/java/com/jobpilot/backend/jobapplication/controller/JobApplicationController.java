@@ -13,6 +13,7 @@ import com.jobpilot.backend.jobapplication.service.JobApplicationService;
 import com.jobpilot.backend.user.entity.User;
 import jakarta.validation.Valid;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.PageRequest;
@@ -124,6 +125,13 @@ public class JobApplicationController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdateFavoriteRequest request) {
         return jobApplicationService.updateFavorite(user, id, request);
+    }
+
+    @PostMapping("/demo")
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<JobApplicationResponse> createDemoApplications(
+            @AuthenticationPrincipal User user) {
+        return jobApplicationService.createDemoApplications(user);
     }
 
 }
