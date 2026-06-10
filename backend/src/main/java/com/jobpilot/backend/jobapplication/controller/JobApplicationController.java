@@ -76,26 +76,12 @@ public class JobApplicationController {
                 PaginationUtils.normalizeSize(size),
                 Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        if (search != null && !search.isBlank()) {
-            return jobApplicationService.searchForUser(
-                    user,
-                    search,
-                    pageRequest);
-        }
-
-        if (status != null && favorite != null) {
-            return jobApplicationService.findAllForUserByStatusAndFavorite(user, status, favorite, pageRequest);
-        }
-
-        if (status != null) {
-            return jobApplicationService.findAllForUserByStatus(user, status, pageRequest);
-        }
-
-        if (favorite != null) {
-            return jobApplicationService.findAllForUserByFavorite(user, favorite, pageRequest);
-        }
-
-        return jobApplicationService.findAllForUser(user, pageRequest);
+        return jobApplicationService.findAllForUserWithFilters(
+                user,
+                status,
+                favorite,
+                search,
+                pageRequest);
 
     }
 
