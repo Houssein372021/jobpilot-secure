@@ -69,11 +69,19 @@ public class JobApplicationController {
             @RequestParam(required = false) ApplicationStatus status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(required = false) Boolean favorite,
+            @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "10") int size) {
         PageRequest pageRequest = PageRequest.of(
                 PaginationUtils.normalizePage(page),
                 PaginationUtils.normalizeSize(size),
                 Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        if (search != null && !search.isBlank()) {
+            return jobApplicationService.searchForUser(
+                    user,
+                    search,
+                    pageRequest);
+        }
 
         if (status != null && favorite != null) {
             return jobApplicationService.findAllForUserByStatusAndFavorite(user, status, favorite, pageRequest);

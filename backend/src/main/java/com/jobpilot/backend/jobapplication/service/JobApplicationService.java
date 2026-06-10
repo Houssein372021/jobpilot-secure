@@ -324,4 +324,16 @@ public class JobApplicationService {
         jobApplicationRepository.deleteAll(demoApplications);
     }
 
+    public PagedResponse<JobApplicationResponse> searchForUser(
+            User user,
+            String search,
+            Pageable pageable) {
+        Page<JobApplication> page = jobApplicationRepository
+                .findByUserIdAndCompanyNameContainingIgnoreCase(
+                        user.getId(),
+                        search,
+                        pageable);
+
+        return toPagedResponse(page);
+    }
 }
