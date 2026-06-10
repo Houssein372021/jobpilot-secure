@@ -14,46 +14,48 @@ import java.util.UUID;
 
 public interface JobApplicationRepository extends JpaRepository<JobApplication, UUID> {
 
-        Page<JobApplication> findByUserId(UUID userId, Pageable pageable);
+    Page<JobApplication> findByUserId(UUID userId, Pageable pageable);
 
-        Page<JobApplication> findByUserIdAndStatus(
-                        UUID userId,
-                        ApplicationStatus status,
-                        Pageable pageable);
+    Page<JobApplication> findByUserIdAndStatus(
+            UUID userId,
+            ApplicationStatus status,
+            Pageable pageable);
 
-        Optional<JobApplication> findByIdAndUserId(UUID id, UUID userId);
+    Optional<JobApplication> findByIdAndUserId(UUID id, UUID userId);
 
-        long countByUserIdAndStatus(UUID userId, ApplicationStatus status);
+    long countByUserIdAndStatus(UUID userId, ApplicationStatus status);
 
-        @Query("""
-                        SELECT j FROM JobApplication j
-                        WHERE j.user.id = :userId
-                        AND (
-                            LOWER(j.companyName) LIKE LOWER(CONCAT('%', :query, '%'))
-                            OR LOWER(j.jobTitle) LIKE LOWER(CONCAT('%', :query, '%'))
-                            OR LOWER(j.location) LIKE LOWER(CONCAT('%', :query, '%'))
-                            OR LOWER(j.source) LIKE LOWER(CONCAT('%', :query, '%'))
-                        )
-                        ORDER BY j.createdAt DESC
-                        """)
-        Page<JobApplication> searchForUser(
-                        UUID userId,
-                        String query,
-                        Pageable pageable);
+    @Query("""
+            SELECT j FROM JobApplication j
+            WHERE j.user.id = :userId
+            AND (
+                LOWER(j.companyName) LIKE LOWER(CONCAT('%', :query, '%'))
+                OR LOWER(j.jobTitle) LIKE LOWER(CONCAT('%', :query, '%'))
+                OR LOWER(j.location) LIKE LOWER(CONCAT('%', :query, '%'))
+                OR LOWER(j.source) LIKE LOWER(CONCAT('%', :query, '%'))
+            )
+            ORDER BY j.createdAt DESC
+            """)
+    Page<JobApplication> searchForUser(
+            UUID userId,
+            String query,
+            Pageable pageable);
 
-        Page<JobApplication> findByUserIdAndFavorite(
-                        UUID userId,
-                        boolean favorite,
-                        Pageable pageable);
+    Page<JobApplication> findByUserIdAndFavorite(
+            UUID userId,
+            boolean favorite,
+            Pageable pageable);
 
-        Page<JobApplication> findByUserIdAndStatusAndFavorite(
-                        UUID userId,
-                        ApplicationStatus status,
-                        boolean favorite,
-                        Pageable pageable);
+    Page<JobApplication> findByUserIdAndStatusAndFavorite(
+            UUID userId,
+            ApplicationStatus status,
+            boolean favorite,
+            Pageable pageable);
 
-        List<JobApplication> findByUserIdAndSource(
-                        UUID userId,
-                        String source);
+    List<JobApplication> findByUserIdAndSource(
+            UUID userId,
+            String source);
+
+    long countByUserIdAndFavorite(UUID userId, boolean favorite);
 
 }

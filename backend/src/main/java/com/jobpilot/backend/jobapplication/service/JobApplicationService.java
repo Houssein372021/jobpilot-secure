@@ -159,6 +159,7 @@ public class JobApplicationService {
         long offer = jobApplicationRepository.countByUserIdAndStatus(user.getId(), ApplicationStatus.OFFER);
         long rejected = jobApplicationRepository.countByUserIdAndStatus(user.getId(), ApplicationStatus.REJECTED);
         long withdrawn = jobApplicationRepository.countByUserIdAndStatus(user.getId(), ApplicationStatus.WITHDRAWN);
+        long favorites = jobApplicationRepository.countByUserIdAndFavorite(user.getId(), true);
 
         long total = saved + applied + interview + offer + rejected + withdrawn;
 
@@ -169,7 +170,8 @@ public class JobApplicationService {
                 interview,
                 offer,
                 rejected,
-                withdrawn);
+                withdrawn,
+                favorites);
     }
 
     public PagedResponse<JobApplicationResponse> search(
