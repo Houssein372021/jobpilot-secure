@@ -210,8 +210,6 @@ public class JobApplicationService {
                 .findByIdAndUserId(applicationId, user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable"));
 
-        jobApplication.setStatus(request.status());
-
         updateStatusAndAppliedDate(jobApplication, request.status());
 
         jobApplication.setUpdatedAt(LocalDateTime.now());
@@ -223,10 +221,17 @@ public class JobApplicationService {
 
     private void updateStatusAndAppliedDate(
             JobApplication jobApplication,
-            ApplicationStatus status) {
-        jobApplication.setStatus(status);
+            ApplicationStatus newStatus) {
+        ApplicationStatus currentStatus = jobApplication.getStatus();
 
-        if (status == ApplicationStatus.APPLIED && jobApplication.getAppliedAt() == null) {
+        if (currentStatus == ApplicationStatus.REJECTED
+                || currentStatus == ApplicationStatus.WITHDRAWN) {
+            throw new IllegalArgumentException("Impossible de modifier le statut d'une candidature terminée");
+        }
+
+        jobApplication.setStatus(newStatus);
+
+        if (newStatus == ApplicationStatus.APPLIED && jobApplication.getAppliedAt() == null) {
             jobApplication.setAppliedAt(LocalDateTime.now());
         }
     }
