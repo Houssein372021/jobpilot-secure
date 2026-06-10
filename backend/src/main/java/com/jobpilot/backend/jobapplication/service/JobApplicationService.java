@@ -114,6 +114,10 @@ public class JobApplicationService {
 
         if (request.status() != null) {
             jobApplication.setStatus(request.status());
+
+            if (request.status() == ApplicationStatus.APPLIED && jobApplication.getAppliedAt() == null) {
+                jobApplication.setAppliedAt(LocalDateTime.now());
+            }
         }
 
         if (request.source() != null) {
