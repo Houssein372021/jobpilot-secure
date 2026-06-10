@@ -168,4 +168,13 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
             @Param("excludedStatuses") List<ApplicationStatus> excludedStatuses,
             Pageable pageable);
 
+    @Query("""
+            SELECT COUNT(j) FROM JobApplication j
+            WHERE j.user.id = :userId
+            AND j.followUpAt IS NULL
+            AND j.status NOT IN :excludedStatuses
+            """)
+    long countApplicationsWithoutFollowUpForUser(
+            @Param("userId") UUID userId,
+            @Param("excludedStatuses") List<ApplicationStatus> excludedStatuses);
 }

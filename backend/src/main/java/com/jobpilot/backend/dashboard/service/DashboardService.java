@@ -137,6 +137,14 @@ public class DashboardService {
                 user.getId(),
                 now);
 
+        List<ApplicationStatus> excludedStatuses = List.of(
+                ApplicationStatus.REJECTED,
+                ApplicationStatus.WITHDRAWN);
+
+        long applicationsWithoutFollowUp = jobApplicationRepository.countApplicationsWithoutFollowUpForUser(
+                user.getId(),
+                excludedStatuses);
+
         long savedApplications = jobApplicationRepository.countByUserIdAndStatus(
                 user.getId(),
                 ApplicationStatus.SAVED);
@@ -149,6 +157,7 @@ public class DashboardService {
                 todayFollowUps,
                 overdueFollowUps,
                 upcomingFollowUps,
+                applicationsWithoutFollowUp,
                 savedApplications,
                 interviewApplications);
     }

@@ -4,6 +4,7 @@ public record DashboardActionSummaryResponse(
         long todayFollowUps,
         long overdueFollowUps,
         long upcomingFollowUps,
+        long applicationsWithoutFollowUp,
         long savedApplications,
         long interviewApplications) {
 }
