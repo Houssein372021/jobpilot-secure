@@ -7,6 +7,7 @@ import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationStatsResponse;
 import com.jobpilot.backend.jobapplication.dto.UpdateApplicationStatusRequest;
 import com.jobpilot.backend.jobapplication.dto.UpdateFavoriteRequest;
+import com.jobpilot.backend.jobapplication.dto.UpdateFollowUpRequest;
 import com.jobpilot.backend.jobapplication.dto.UpdateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.entity.ApplicationStatus;
 import com.jobpilot.backend.jobapplication.service.JobApplicationService;
@@ -146,5 +147,13 @@ public class JobApplicationController {
             case "createdAt", "updatedAt", "companyName", "jobTitle", "status", "favorite" -> sortBy;
             default -> "createdAt";
         };
+    }
+
+    @PatchMapping("/{id}/follow-up")
+    public JobApplicationResponse updateFollowUp(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID id,
+            @RequestBody UpdateFollowUpRequest request) {
+        return jobApplicationService.updateFollowUp(user, id, request);
     }
 }

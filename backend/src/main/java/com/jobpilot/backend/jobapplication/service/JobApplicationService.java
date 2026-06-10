@@ -7,6 +7,7 @@ import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationStatsResponse;
 import com.jobpilot.backend.jobapplication.dto.UpdateApplicationStatusRequest;
 import com.jobpilot.backend.jobapplication.dto.UpdateFavoriteRequest;
+import com.jobpilot.backend.jobapplication.dto.UpdateFollowUpRequest;
 import com.jobpilot.backend.jobapplication.dto.UpdateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.entity.ApplicationStatus;
 import com.jobpilot.backend.jobapplication.entity.JobApplication;
@@ -348,4 +349,19 @@ public class JobApplicationService {
 
         return toPagedResponse(page);
     }
+
+    public JobApplicationResponse updateFollowUp(
+            User user,
+            UUID id,
+            UpdateFollowUpRequest request) {
+        JobApplication jobApplication = jobApplicationRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable"));
+
+        jobApplication.setFollowUpAt(request.followUpAt());
+
+        JobApplication savedJobApplication = jobApplicationRepository.save(jobApplication);
+
+        return toResponse(savedJobApplication);
+    }
+
 }
