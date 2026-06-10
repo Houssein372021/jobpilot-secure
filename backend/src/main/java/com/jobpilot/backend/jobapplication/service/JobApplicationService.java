@@ -5,6 +5,7 @@ import com.jobpilot.backend.common.exception.ResourceNotFoundException;
 import com.jobpilot.backend.jobapplication.dto.CreateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationStatsResponse;
+import com.jobpilot.backend.jobapplication.dto.UpdateApplicationStatusRequest;
 import com.jobpilot.backend.jobapplication.dto.UpdateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.entity.ApplicationStatus;
 import com.jobpilot.backend.jobapplication.entity.JobApplication;
@@ -203,6 +204,27 @@ public class JobApplicationService {
                 page.getTotalElements(),
                 page.getTotalPages(),
                 page.isLast());
+    }
+
+    public JobApplicationResponse updateStatus(
+            User user,
+            UUID applicationId,
+            UpdateApplicationStatusRequest request) {
+        JobApplication jobApplication = jobApplicationRepository
+                .findByIdAndUserId(applicationId, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable"));
+
+        jobApplication.setStatus(request.status());
+
+        if (request.status() == ApplicationStatus.APPLIED && jobApplication.getAppliedAt() == null) {
+            jobApplication.setAppliedAt(LocalDateTime.now());
+        }
+
+        jobApplication.setUpdatedAt(LocalDateTime.now());
+
+        JobApplication updatedApplication = jobApplicationRepository.save(jobApplication);
+
+        return toResponse(updatedApplication);
     }
 
 }
