@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,15 +29,16 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
             SELECT j FROM JobApplication j
             WHERE j.user.id = :userId
             AND (
-                LOWER(j.companyName) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(j.jobTitle) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(j.location) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(j.notes) LIKE LOWER(CONCAT('%', :search, '%'))
+                LOWER(j.companyName) LIKE LOWER(CONCAT('%', :query, '%'))
+                OR LOWER(j.jobTitle) LIKE LOWER(CONCAT('%', :query, '%'))
+                OR LOWER(j.location) LIKE LOWER(CONCAT('%', :query, '%'))
+                OR LOWER(j.source) LIKE LOWER(CONCAT('%', :query, '%'))
             )
+            ORDER BY j.createdAt DESC
             """)
     Page<JobApplication> searchForUser(
-            @Param("userId") UUID userId,
-            @Param("search") String search,
+            UUID userId,
+            String query,
             Pageable pageable);
 
     Page<JobApplication> findByUserIdAndFavorite(
@@ -58,4 +58,8 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
 
     long countByUserIdAndFavorite(UUID userId, boolean favorite);
 
+    Page<JobApplication> findByUserIdAndCompanyNameContainingIgnoreCase(
+            UUID userId,
+            String companyName,
+            Pageable pageable);
 }
