@@ -91,11 +91,13 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
             WHERE j.user.id = :userId
             AND j.followUpAt IS NOT NULL
             AND j.followUpAt >= :now
+            AND j.status NOT IN :excludedStatuses
             ORDER BY j.followUpAt ASC
             """)
     Page<JobApplication> findUpcomingFollowUpsForUser(
             @Param("userId") UUID userId,
             @Param("now") LocalDateTime now,
+            @Param("excludedStatuses") List<ApplicationStatus> excludedStatuses,
             Pageable pageable);
 
     @Query("""
@@ -103,11 +105,13 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
             WHERE j.user.id = :userId
             AND j.followUpAt IS NOT NULL
             AND j.followUpAt < :now
+            AND j.status NOT IN :excludedStatuses
             ORDER BY j.followUpAt ASC
             """)
     Page<JobApplication> findOverdueFollowUpsForUser(
             @Param("userId") UUID userId,
             @Param("now") LocalDateTime now,
+            @Param("excludedStatuses") List<ApplicationStatus> excludedStatuses,
             Pageable pageable);
 
     @Query("""
@@ -116,12 +120,14 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
             AND j.followUpAt IS NOT NULL
             AND j.followUpAt >= :startOfDay
             AND j.followUpAt < :endOfDay
+            AND j.status NOT IN :excludedStatuses
             ORDER BY j.followUpAt ASC
             """)
     Page<JobApplication> findTodayFollowUpsForUser(
             @Param("userId") UUID userId,
             @Param("startOfDay") LocalDateTime startOfDay,
             @Param("endOfDay") LocalDateTime endOfDay,
+            @Param("excludedStatuses") List<ApplicationStatus> excludedStatuses,
             Pageable pageable);
 
     @Query("""
@@ -130,31 +136,37 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
             AND j.followUpAt IS NOT NULL
             AND j.followUpAt >= :startOfDay
             AND j.followUpAt < :endOfDay
+            AND j.status NOT IN :excludedStatuses
             """)
     long countTodayFollowUpsForUser(
             @Param("userId") UUID userId,
             @Param("startOfDay") LocalDateTime startOfDay,
-            @Param("endOfDay") LocalDateTime endOfDay);
+            @Param("endOfDay") LocalDateTime endOfDay,
+            @Param("excludedStatuses") List<ApplicationStatus> excludedStatuses);
 
     @Query("""
             SELECT COUNT(j) FROM JobApplication j
             WHERE j.user.id = :userId
             AND j.followUpAt IS NOT NULL
             AND j.followUpAt < :now
+            AND j.status NOT IN :excludedStatuses
             """)
     long countOverdueFollowUpsForUser(
             @Param("userId") UUID userId,
-            @Param("now") LocalDateTime now);
+            @Param("now") LocalDateTime now,
+            @Param("excludedStatuses") List<ApplicationStatus> excludedStatuses);
 
     @Query("""
             SELECT COUNT(j) FROM JobApplication j
             WHERE j.user.id = :userId
             AND j.followUpAt IS NOT NULL
             AND j.followUpAt >= :now
+            AND j.status NOT IN :excludedStatuses
             """)
     long countUpcomingFollowUpsForUser(
             @Param("userId") UUID userId,
-            @Param("now") LocalDateTime now);
+            @Param("now") LocalDateTime now,
+            @Param("excludedStatuses") List<ApplicationStatus> excludedStatuses);
 
     @Query("""
             SELECT j FROM JobApplication j

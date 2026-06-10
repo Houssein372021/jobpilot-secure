@@ -83,7 +83,11 @@ public class DashboardService {
                 5);
 
         return jobApplicationRepository
-                .findUpcomingFollowUpsForUser(user.getId(), LocalDateTime.now(), pageRequest)
+                .findUpcomingFollowUpsForUser(
+                        user.getId(),
+                        LocalDateTime.now(),
+                        getExcludedFollowUpStatuses(),
+                        pageRequest)
                 .getContent()
                 .stream()
                 .map(this::toJobApplicationResponse)
@@ -96,7 +100,11 @@ public class DashboardService {
                 5);
 
         return jobApplicationRepository
-                .findOverdueFollowUpsForUser(user.getId(), LocalDateTime.now(), pageRequest)
+                .findOverdueFollowUpsForUser(
+                        user.getId(),
+                        LocalDateTime.now(),
+                        getExcludedFollowUpStatuses(),
+                        pageRequest)
                 .getContent()
                 .stream()
                 .map(this::toJobApplicationResponse)
@@ -112,7 +120,12 @@ public class DashboardService {
                 5);
 
         return jobApplicationRepository
-                .findTodayFollowUpsForUser(user.getId(), startOfDay, endOfDay, pageRequest)
+                .findTodayFollowUpsForUser(
+                        user.getId(),
+                        startOfDay,
+                        endOfDay,
+                        getExcludedFollowUpStatuses(),
+                        pageRequest)
                 .getContent()
                 .stream()
                 .map(this::toJobApplicationResponse)
@@ -127,15 +140,18 @@ public class DashboardService {
         long todayFollowUps = jobApplicationRepository.countTodayFollowUpsForUser(
                 user.getId(),
                 startOfDay,
-                endOfDay);
+                endOfDay,
+                getExcludedFollowUpStatuses());
 
         long overdueFollowUps = jobApplicationRepository.countOverdueFollowUpsForUser(
                 user.getId(),
-                now);
+                now,
+                getExcludedFollowUpStatuses());
 
         long upcomingFollowUps = jobApplicationRepository.countUpcomingFollowUpsForUser(
                 user.getId(),
-                now);
+                now,
+                getExcludedFollowUpStatuses());
 
         List<ApplicationStatus> excludedStatuses = List.of(
                 ApplicationStatus.REJECTED,
@@ -177,5 +193,11 @@ public class DashboardService {
                 .stream()
                 .map(this::toJobApplicationResponse)
                 .toList();
+    }
+
+    private List<ApplicationStatus> getExcludedFollowUpStatuses() {
+        return List.of(
+                ApplicationStatus.REJECTED,
+                ApplicationStatus.WITHDRAWN);
     }
 }
