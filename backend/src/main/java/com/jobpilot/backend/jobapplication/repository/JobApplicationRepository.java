@@ -37,9 +37,10 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
             )
             ORDER BY j.createdAt DESC
             """)
-    List<JobApplication> searchForUser(
-            UUID userId,
-            String query
-    );
+    Page<JobApplication> searchForUser(
+                UUID userId,
+                String query,
+                Pageable pageable
+        );
 
 }

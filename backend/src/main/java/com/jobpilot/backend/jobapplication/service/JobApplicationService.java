@@ -187,11 +187,25 @@ public class JobApplicationService {
         );
     }
 
-    public List<JobApplicationResponse> search(User user, String query) {
-    return jobApplicationRepository.searchForUser(user.getId(), query)
-            .stream()
-            .map(this::toResponse)
-            .toList();
-}
+    public PagedResponse<JobApplicationResponse> search(
+            User user,
+            String query,
+            Pageable pageable
+    ) {
+        Page<JobApplication> page = jobApplicationRepository
+                .searchForUser(user.getId(), query, pageable);
+
+        return new PagedResponse<>(
+                page.getContent()
+                        .stream()
+                        .map(this::toResponse)
+                        .toList(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast()
+        );
+    }
 
 }

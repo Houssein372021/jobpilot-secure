@@ -92,11 +92,19 @@ public class JobApplicationController {
     }
 
     @GetMapping("/search")
-    public List<JobApplicationResponse> search(
+    public PagedResponse<JobApplicationResponse> search(
             @AuthenticationPrincipal User user,
-            @RequestParam String query
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
-        return jobApplicationService.search(user, query);
+        PageRequest pageRequest = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+
+        return jobApplicationService.search(user, query, pageRequest);
     }
 
 
