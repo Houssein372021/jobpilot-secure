@@ -15,72 +15,74 @@ import java.util.UUID;
 
 public interface JobApplicationRepository extends JpaRepository<JobApplication, UUID> {
 
-    Page<JobApplication> findByUserId(UUID userId, Pageable pageable);
+        Page<JobApplication> findByUserId(UUID userId, Pageable pageable);
 
-    Page<JobApplication> findByUserIdAndStatus(
-            UUID userId,
-            ApplicationStatus status,
-            Pageable pageable);
+        Page<JobApplication> findByUserIdAndStatus(
+                        UUID userId,
+                        ApplicationStatus status,
+                        Pageable pageable);
 
-    Optional<JobApplication> findByIdAndUserId(UUID id, UUID userId);
+        Optional<JobApplication> findByIdAndUserId(UUID id, UUID userId);
 
-    long countByUserIdAndStatus(UUID userId, ApplicationStatus status);
+        long countByUserId(UUID userId);
 
-    @Query("""
-            SELECT j FROM JobApplication j
-            WHERE j.user.id = :userId
-            AND (
-                LOWER(j.companyName) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(j.jobTitle) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(j.location) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(j.notes) LIKE LOWER(CONCAT('%', :search, '%'))
-            )
-            """)
-    Page<JobApplication> searchForUser(
-            @Param("userId") UUID userId,
-            @Param("search") String search,
-            Pageable pageable);
+        long countByUserIdAndStatus(UUID userId, ApplicationStatus status);
 
-    Page<JobApplication> findByUserIdAndFavorite(
-            UUID userId,
-            boolean favorite,
-            Pageable pageable);
+        @Query("""
+                        SELECT j FROM JobApplication j
+                        WHERE j.user.id = :userId
+                        AND (
+                            LOWER(j.companyName) LIKE LOWER(CONCAT('%', :search, '%'))
+                            OR LOWER(j.jobTitle) LIKE LOWER(CONCAT('%', :search, '%'))
+                            OR LOWER(j.location) LIKE LOWER(CONCAT('%', :search, '%'))
+                            OR LOWER(j.notes) LIKE LOWER(CONCAT('%', :search, '%'))
+                        )
+                        """)
+        Page<JobApplication> searchForUser(
+                        @Param("userId") UUID userId,
+                        @Param("search") String search,
+                        Pageable pageable);
 
-    Page<JobApplication> findByUserIdAndStatusAndFavorite(
-            UUID userId,
-            ApplicationStatus status,
-            boolean favorite,
-            Pageable pageable);
+        Page<JobApplication> findByUserIdAndFavorite(
+                        UUID userId,
+                        boolean favorite,
+                        Pageable pageable);
 
-    List<JobApplication> findByUserIdAndSource(
-            UUID userId,
-            String source);
+        Page<JobApplication> findByUserIdAndStatusAndFavorite(
+                        UUID userId,
+                        ApplicationStatus status,
+                        boolean favorite,
+                        Pageable pageable);
 
-    long countByUserIdAndFavorite(UUID userId, boolean favorite);
+        List<JobApplication> findByUserIdAndSource(
+                        UUID userId,
+                        String source);
 
-    @Query("""
-            SELECT j FROM JobApplication j
-            WHERE j.user.id = :userId
-            AND (
-                :status IS NULL OR j.status = :status
-            )
-            AND (
-                :favorite IS NULL OR j.favorite = :favorite
-            )
-            AND (
-                :search IS NULL
-                OR :search = ''
-                OR LOWER(j.companyName) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(j.jobTitle) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(j.location) LIKE LOWER(CONCAT('%', :search, '%'))
-                OR LOWER(j.notes) LIKE LOWER(CONCAT('%', :search, '%'))
-            )
-            """)
-    Page<JobApplication> findAllForUserWithFilters(
-            @Param("userId") UUID userId,
-            @Param("status") ApplicationStatus status,
-            @Param("favorite") Boolean favorite,
-            @Param("search") String search,
-            Pageable pageable);
+        long countByUserIdAndFavorite(UUID userId, boolean favorite);
+
+        @Query("""
+                        SELECT j FROM JobApplication j
+                        WHERE j.user.id = :userId
+                        AND (
+                            :status IS NULL OR j.status = :status
+                        )
+                        AND (
+                            :favorite IS NULL OR j.favorite = :favorite
+                        )
+                        AND (
+                            :search IS NULL
+                            OR :search = ''
+                            OR LOWER(j.companyName) LIKE LOWER(CONCAT('%', :search, '%'))
+                            OR LOWER(j.jobTitle) LIKE LOWER(CONCAT('%', :search, '%'))
+                            OR LOWER(j.location) LIKE LOWER(CONCAT('%', :search, '%'))
+                            OR LOWER(j.notes) LIKE LOWER(CONCAT('%', :search, '%'))
+                        )
+                        """)
+        Page<JobApplication> findAllForUserWithFilters(
+                        @Param("userId") UUID userId,
+                        @Param("status") ApplicationStatus status,
+                        @Param("favorite") Boolean favorite,
+                        @Param("search") String search,
+                        Pageable pageable);
 
 }
