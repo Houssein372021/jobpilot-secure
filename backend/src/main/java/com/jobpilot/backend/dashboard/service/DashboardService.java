@@ -1,9 +1,16 @@
 package com.jobpilot.backend.dashboard.service;
 
 import com.jobpilot.backend.dashboard.dto.DashboardStatsResponse;
+import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
 import com.jobpilot.backend.jobapplication.entity.ApplicationStatus;
+import com.jobpilot.backend.jobapplication.entity.JobApplication;
 import com.jobpilot.backend.jobapplication.repository.JobApplicationRepository;
 import com.jobpilot.backend.user.entity.User;
+
+import java.util.List;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,5 +41,35 @@ public class DashboardService {
                 rejected,
                 withdrawn,
                 favorites);
+    }
+
+    public List<JobApplicationResponse> getRecentApplications(User user) {
+        PageRequest pageRequest = PageRequest.of(
+                0,
+                5,
+                Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        return jobApplicationRepository.findByUserId(user.getId(), pageRequest)
+                .getContent()
+                .stream()
+                .map(this::toJobApplicationResponse)
+                .toList();
+    }
+
+    private JobApplicationResponse toJobApplicationResponse(JobApplication jobApplication) {
+        return new JobApplicationResponse(
+                jobApplication.getId(),
+                jobApplication.getCompanyName(),
+                jobApplication.getJobTitle(),
+                jobApplication.getLocation(),
+                jobApplication.getContractType(),
+                jobApplication.getStatus().name(),
+                jobApplication.getSource(),
+                jobApplication.getApplicationUrl(),
+                jobApplication.getNotes(),
+                jobApplication.getAppliedAt(),
+                jobApplication.getCreatedAt(),
+                jobApplication.getUpdatedAt(),
+                jobApplication.isFavorite());
     }
 }
