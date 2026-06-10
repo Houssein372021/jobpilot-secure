@@ -1,5 +1,6 @@
 package com.jobpilot.backend.dashboard.controller;
 
+import com.jobpilot.backend.dashboard.dto.DashboardActionSummaryResponse;
 import com.jobpilot.backend.dashboard.dto.DashboardStatsResponse;
 import com.jobpilot.backend.dashboard.service.DashboardService;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
@@ -50,5 +51,11 @@ public class DashboardController {
     public List<JobApplicationResponse> getTodayFollowUps(
             @AuthenticationPrincipal User user) {
         return dashboardService.getTodayFollowUps(user);
+    }
+
+    @GetMapping("/action-summary")
+    public DashboardActionSummaryResponse getActionSummary(
+            @AuthenticationPrincipal User user) {
+        return dashboardService.getActionSummary(user);
     }
 }

@@ -124,4 +124,36 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
             @Param("endOfDay") LocalDateTime endOfDay,
             Pageable pageable);
 
+    @Query("""
+            SELECT COUNT(j) FROM JobApplication j
+            WHERE j.user.id = :userId
+            AND j.followUpAt IS NOT NULL
+            AND j.followUpAt >= :startOfDay
+            AND j.followUpAt < :endOfDay
+            """)
+    long countTodayFollowUpsForUser(
+            @Param("userId") UUID userId,
+            @Param("startOfDay") LocalDateTime startOfDay,
+            @Param("endOfDay") LocalDateTime endOfDay);
+
+    @Query("""
+            SELECT COUNT(j) FROM JobApplication j
+            WHERE j.user.id = :userId
+            AND j.followUpAt IS NOT NULL
+            AND j.followUpAt < :now
+            """)
+    long countOverdueFollowUpsForUser(
+            @Param("userId") UUID userId,
+            @Param("now") LocalDateTime now);
+
+    @Query("""
+            SELECT COUNT(j) FROM JobApplication j
+            WHERE j.user.id = :userId
+            AND j.followUpAt IS NOT NULL
+            AND j.followUpAt >= :now
+            """)
+    long countUpcomingFollowUpsForUser(
+            @Param("userId") UUID userId,
+            @Param("now") LocalDateTime now);
+
 }

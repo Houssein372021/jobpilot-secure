@@ -1,5 +1,6 @@
 package com.jobpilot.backend.dashboard.service;
 
+import com.jobpilot.backend.dashboard.dto.DashboardActionSummaryResponse;
 import com.jobpilot.backend.dashboard.dto.DashboardStatsResponse;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
 import com.jobpilot.backend.jobapplication.entity.ApplicationStatus;
@@ -116,5 +117,39 @@ public class DashboardService {
                 .stream()
                 .map(this::toJobApplicationResponse)
                 .toList();
+    }
+
+    public DashboardActionSummaryResponse getActionSummary(User user) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        long todayFollowUps = jobApplicationRepository.countTodayFollowUpsForUser(
+                user.getId(),
+                startOfDay,
+                endOfDay);
+
+        long overdueFollowUps = jobApplicationRepository.countOverdueFollowUpsForUser(
+                user.getId(),
+                now);
+
+        long upcomingFollowUps = jobApplicationRepository.countUpcomingFollowUpsForUser(
+                user.getId(),
+                now);
+
+        long savedApplications = jobApplicationRepository.countByUserIdAndStatus(
+                user.getId(),
+                ApplicationStatus.SAVED);
+
+        long interviewApplications = jobApplicationRepository.countByUserIdAndStatus(
+                user.getId(),
+                ApplicationStatus.INTERVIEW);
+
+        return new DashboardActionSummaryResponse(
+                todayFollowUps,
+                overdueFollowUps,
+                upcomingFollowUps,
+                savedApplications,
+                interviewApplications);
     }
 }
