@@ -1,6 +1,7 @@
 package com.jobpilot.backend.jobapplication.service;
 
 import com.jobpilot.backend.common.dto.PagedResponse;
+import com.jobpilot.backend.common.exception.ResourceNotFoundException;
 import com.jobpilot.backend.jobapplication.dto.CreateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationStatsResponse;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -60,16 +60,14 @@ public class JobApplicationService {
                 jobApplication.getNotes(),
                 jobApplication.getAppliedAt(),
                 jobApplication.getCreatedAt(),
-                jobApplication.getUpdatedAt()
-        );
+                jobApplication.getUpdatedAt());
     }
 
     public PagedResponse<JobApplicationResponse> findAllForUser(
             User user,
-            Pageable pageable
-    ) {
+            Pageable pageable) {
         Page<JobApplication> page = jobApplicationRepository.findByUserId(user.getId(), pageable);
-    
+
         return new PagedResponse<>(
                 page.getContent()
                         .stream()
@@ -79,14 +77,13 @@ public class JobApplicationService {
                 page.getSize(),
                 page.getTotalElements(),
                 page.getTotalPages(),
-                page.isLast()
-        );
+                page.isLast());
     }
 
     public JobApplicationResponse findByIdForUser(User user, UUID applicationId) {
         JobApplication jobApplication = jobApplicationRepository
                 .findByIdAndUserId(applicationId, user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Candidature introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable"));
 
         return toResponse(jobApplication);
     }
@@ -94,11 +91,10 @@ public class JobApplicationService {
     public JobApplicationResponse update(
             User user,
             UUID applicationId,
-            UpdateJobApplicationRequest request
-    ) {
+            UpdateJobApplicationRequest request) {
         JobApplication jobApplication = jobApplicationRepository
                 .findByIdAndUserId(applicationId, user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Candidature introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable"));
 
         if (request.companyName() != null) {
             jobApplication.setCompanyName(request.companyName());
@@ -142,7 +138,7 @@ public class JobApplicationService {
     public void delete(User user, UUID applicationId) {
         JobApplication jobApplication = jobApplicationRepository
                 .findByIdAndUserId(applicationId, user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Candidature introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable"));
 
         jobApplicationRepository.delete(jobApplication);
     }
@@ -150,8 +146,7 @@ public class JobApplicationService {
     public PagedResponse<JobApplicationResponse> findAllForUserByStatus(
             User user,
             ApplicationStatus status,
-            Pageable pageable
-    ) {
+            Pageable pageable) {
         Page<JobApplication> page = jobApplicationRepository
                 .findByUserIdAndStatus(user.getId(), status, pageable);
 
@@ -164,8 +159,7 @@ public class JobApplicationService {
                 page.getSize(),
                 page.getTotalElements(),
                 page.getTotalPages(),
-                page.isLast()
-        );
+                page.isLast());
     }
 
     public JobApplicationStatsResponse getStats(User user) {
@@ -174,24 +168,22 @@ public class JobApplicationService {
         long interview = jobApplicationRepository.countByUserIdAndStatus(user.getId(), ApplicationStatus.INTERVIEW);
         long offer = jobApplicationRepository.countByUserIdAndStatus(user.getId(), ApplicationStatus.OFFER);
         long rejected = jobApplicationRepository.countByUserIdAndStatus(user.getId(), ApplicationStatus.REJECTED);
-    
+
         long total = saved + applied + interview + offer + rejected;
-    
+
         return new JobApplicationStatsResponse(
                 total,
                 saved,
                 applied,
                 interview,
                 offer,
-                rejected
-        );
+                rejected);
     }
 
     public PagedResponse<JobApplicationResponse> search(
             User user,
             String query,
-            Pageable pageable
-    ) {
+            Pageable pageable) {
         Page<JobApplication> page = jobApplicationRepository
                 .searchForUser(user.getId(), query, pageable);
 
@@ -204,8 +196,7 @@ public class JobApplicationService {
                 page.getSize(),
                 page.getTotalElements(),
                 page.getTotalPages(),
-                page.isLast()
-        );
+                page.isLast());
     }
 
 }

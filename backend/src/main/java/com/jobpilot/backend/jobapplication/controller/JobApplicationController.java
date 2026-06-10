@@ -11,7 +11,6 @@ import com.jobpilot.backend.jobapplication.service.JobApplicationService;
 import com.jobpilot.backend.user.entity.User;
 import jakarta.validation.Valid;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.PageRequest;
