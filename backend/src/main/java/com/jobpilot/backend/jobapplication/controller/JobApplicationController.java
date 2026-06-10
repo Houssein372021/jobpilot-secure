@@ -1,6 +1,7 @@
 package com.jobpilot.backend.jobapplication.controller;
 
 import com.jobpilot.backend.common.dto.PagedResponse;
+import com.jobpilot.backend.common.util.PaginationUtils;
 import com.jobpilot.backend.jobapplication.dto.CreateJobApplicationRequest;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationResponse;
 import com.jobpilot.backend.jobapplication.dto.JobApplicationStatsResponse;
@@ -72,8 +73,8 @@ public class JobApplicationController {
             @RequestParam(defaultValue = "10") int size
     ) {
         PageRequest pageRequest = PageRequest.of(
-                page,
-                size,
+                PaginationUtils.normalizePage(page),
+                PaginationUtils.normalizeSize(size),
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
     
@@ -99,8 +100,8 @@ public class JobApplicationController {
             @RequestParam(defaultValue = "10") int size
     ) {
         PageRequest pageRequest = PageRequest.of(
-                page,
-                size,
+                PaginationUtils.normalizePage(page),
+                PaginationUtils.normalizeSize(size),
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
 
