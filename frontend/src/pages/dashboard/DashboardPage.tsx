@@ -1,30 +1,48 @@
 import { useEffect, useState } from "react";
-import { BriefcaseBusiness, CalendarCheck, Heart, Send, Trophy, XCircle } from "lucide-react";
-import { getDashboardStats } from "../../api/dashboard";
-import type { DashboardStats } from "../../types/dashboard";
+import {
+  AlertTriangle,
+  BellRing,
+  BriefcaseBusiness,
+  CalendarCheck,
+  CalendarClock,
+  ClipboardList,
+  Heart,
+  Send,
+  Trophy,
+  XCircle,
+} from "lucide-react";
+import { getDashboardActionSummary, getDashboardStats } from "../../api/dashboard";
+import type { DashboardActionSummary, DashboardStats } from "../../types/dashboard";
 
 function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [actionSummary, setActionSummary] = useState<DashboardActionSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    async function loadStats() {
+    async function loadDashboard() {
       try {
         setError("");
-        const response = await getDashboardStats();
-        setStats(response);
+
+        const [statsResponse, actionSummaryResponse] = await Promise.all([
+          getDashboardStats(),
+          getDashboardActionSummary(),
+        ]);
+
+        setStats(statsResponse);
+        setActionSummary(actionSummaryResponse);
       } catch {
-        setError("Impossible de charger les statistiques du dashboard.");
+        setError("Impossible de charger les données du dashboard.");
       } finally {
         setLoading(false);
       }
     }
 
-    loadStats();
+    loadDashboard();
   }, []);
 
-  const cards = stats
+  const statsCards = stats
     ? [
         {
           label: "Total candidatures",
@@ -69,24 +87,57 @@ function DashboardPage() {
       ]
     : [];
 
+  const actionCards = actionSummary
+    ? [
+        {
+          label: "Relances aujourd’hui",
+          value: actionSummary.todayFollowUps,
+          icon: BellRing,
+        },
+        {
+          label: "Relances en retard",
+          value: actionSummary.overdueFollowUps,
+          icon: AlertTriangle,
+        },
+        {
+          label: "Relances à venir",
+          value: actionSummary.upcomingFollowUps,
+          icon: CalendarClock,
+        },
+        {
+          label: "Sans relance prévue",
+          value: actionSummary.applicationsWithoutFollowUp,
+          icon: ClipboardList,
+        },
+        {
+          label: "Candidatures sauvegardées",
+          value: actionSummary.savedApplications,
+          icon: BriefcaseBusiness,
+        },
+        {
+          label: "Entretiens en cours",
+          value: actionSummary.interviewApplications,
+          icon: CalendarCheck,
+        },
+      ]
+    : [];
+
   return (
     <section>
       <div>
         <p className="text-sm font-medium text-blue-400">Tableau de bord</p>
 
-        <h1 className="mt-2 text-3xl font-bold">
-          Dashboard
-        </h1>
+        <h1 className="mt-2 text-3xl font-bold">Dashboard</h1>
 
         <p className="mt-3 max-w-2xl text-slate-400">
-          Visualise rapidement l’état de tes candidatures, tes entretiens,
-          tes offres, tes refus et tes favoris.
+          Visualise rapidement l’état de tes candidatures, tes relances et les
+          actions importantes à traiter.
         </p>
       </div>
 
       {loading && (
         <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-          <p className="text-slate-400">Chargement des statistiques...</p>
+          <p className="text-slate-400">Chargement du dashboard...</p>
         </div>
       )}
 
@@ -96,30 +147,64 @@ function DashboardPage() {
         </div>
       )}
 
-      {!loading && !error && stats && (
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {cards.map((card) => {
-            const Icon = card.icon;
+      {!loading && !error && stats && actionSummary && (
+        <>
+          <div className="mt-8">
+            <h2 className="text-xl font-semibold">Statistiques</h2>
 
-            return (
-              <div
-                key={card.label}
-                className="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-sm"
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-sm text-slate-400">{card.label}</p>
-                    <p className="mt-2 text-3xl font-bold">{card.value}</p>
-                  </div>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {statsCards.map((card) => {
+                const Icon = card.icon;
 
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800 text-blue-400">
-                    <Icon size={22} />
+                return (
+                  <div
+                    key={card.label}
+                    className="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-sm"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-sm text-slate-400">{card.label}</p>
+                        <p className="mt-2 text-3xl font-bold">{card.value}</p>
+                      </div>
+
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800 text-blue-400">
+                        <Icon size={22} />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-10">
+            <h2 className="text-xl font-semibold">Actions à traiter</h2>
+
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {actionCards.map((card) => {
+                const Icon = card.icon;
+
+                return (
+                  <div
+                    key={card.label}
+                    className="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-sm"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-sm text-slate-400">{card.label}</p>
+                        <p className="mt-2 text-3xl font-bold">{card.value}</p>
+                      </div>
+
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800 text-blue-400">
+                        <Icon size={22} />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </>
       )}
     </section>
   );

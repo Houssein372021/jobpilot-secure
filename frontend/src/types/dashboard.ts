@@ -8,3 +8,12 @@ export type DashboardStats = {
   withdrawn: number;
   favorites: number;
 };
+
+export type DashboardActionSummary = {
+  todayFollowUps: number;
+  overdueFollowUps: number;
+  upcomingFollowUps: number;
+  applicationsWithoutFollowUp: number;
+  savedApplications: number;
+  interviewApplications: number;
+};
