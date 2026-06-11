@@ -6,17 +6,29 @@ import {
   CalendarCheck,
   CalendarClock,
   ClipboardList,
+  Clock3,
   Heart,
+  MapPin,
   Send,
   Trophy,
   XCircle,
 } from "lucide-react";
-import { getDashboardActionSummary, getDashboardStats } from "../../api/dashboard";
+import {
+  getDashboardActionSummary,
+  getDashboardStats,
+  getOverdueFollowUps,
+  getTodayFollowUps,
+  getUpcomingFollowUps,
+} from "../../api/dashboard";
 import type { DashboardActionSummary, DashboardStats } from "../../types/dashboard";
+import type { JobApplication } from "../../types/job-application";
 
 function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [actionSummary, setActionSummary] = useState<DashboardActionSummary | null>(null);
+  const [todayFollowUps, setTodayFollowUps] = useState<JobApplication[]>([]);
+  const [overdueFollowUps, setOverdueFollowUps] = useState<JobApplication[]>([]);
+  const [upcomingFollowUps, setUpcomingFollowUps] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -25,13 +37,25 @@ function DashboardPage() {
       try {
         setError("");
 
-        const [statsResponse, actionSummaryResponse] = await Promise.all([
+        const [
+          statsResponse,
+          actionSummaryResponse,
+          todayFollowUpsResponse,
+          overdueFollowUpsResponse,
+          upcomingFollowUpsResponse,
+        ] = await Promise.all([
           getDashboardStats(),
           getDashboardActionSummary(),
+          getTodayFollowUps(),
+          getOverdueFollowUps(),
+          getUpcomingFollowUps(),
         ]);
 
         setStats(statsResponse);
         setActionSummary(actionSummaryResponse);
+        setTodayFollowUps(todayFollowUpsResponse);
+        setOverdueFollowUps(overdueFollowUpsResponse);
+        setUpcomingFollowUps(upcomingFollowUpsResponse);
       } catch {
         setError("Impossible de charger les données du dashboard.");
       } finally {
@@ -204,10 +228,126 @@ function DashboardPage() {
               })}
             </div>
           </div>
+
+          <div className="mt-10">
+            <h2 className="text-xl font-semibold">Relances</h2>
+
+            <div className="mt-4 grid gap-4 xl:grid-cols-3">
+              <FollowUpList
+                title="Aujourd’hui"
+                description="Les candidatures à relancer aujourd’hui."
+                applications={todayFollowUps}
+                emptyMessage="Aucune relance prévue aujourd’hui."
+              />
+
+              <FollowUpList
+                title="En retard"
+                description="Les relances dépassées à traiter en priorité."
+                applications={overdueFollowUps}
+                emptyMessage="Aucune relance en retard."
+              />
+
+              <FollowUpList
+                title="À venir"
+                description="Les prochaines relances planifiées."
+                applications={upcomingFollowUps}
+                emptyMessage="Aucune relance à venir."
+              />
+            </div>
+          </div>
         </>
       )}
     </section>
   );
+}
+
+type FollowUpListProps = {
+  title: string;
+  description: string;
+  applications: JobApplication[];
+  emptyMessage: string;
+};
+
+function FollowUpList({
+  title,
+  description,
+  applications,
+  emptyMessage,
+}: FollowUpListProps) {
+  return (
+    <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
+      <div>
+        <h3 className="font-semibold">{title}</h3>
+        <p className="mt-1 text-sm text-slate-400">{description}</p>
+      </div>
+
+      {applications.length === 0 && (
+        <p className="mt-6 rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm text-slate-400">
+          {emptyMessage}
+        </p>
+      )}
+
+      {applications.length > 0 && (
+        <div className="mt-6 space-y-3">
+          {applications.map((application) => (
+            <article
+              key={application.id}
+              className="rounded-xl border border-slate-800 bg-slate-950 p-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h4 className="font-semibold">{application.companyName}</h4>
+                  <p className="mt-1 text-sm text-slate-400">
+                    {application.jobTitle}
+                  </p>
+                </div>
+
+                <span className="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-300">
+                  {getStatusLabel(application.status)}
+                </span>
+              </div>
+
+              <div className="mt-4 space-y-2 text-sm text-slate-400">
+                {application.followUpAt && (
+                  <p className="flex items-center gap-2">
+                    <Clock3 size={15} />
+                    {formatDateTime(application.followUpAt)}
+                  </p>
+                )}
+
+                {application.location && (
+                  <p className="flex items-center gap-2">
+                    <MapPin size={15} />
+                    {application.location}
+                  </p>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function formatDateTime(value: string) {
+  return new Intl.DateTimeFormat("fr-FR", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
+function getStatusLabel(status: JobApplication["status"]) {
+  const labels: Record<JobApplication["status"], string> = {
+    SAVED: "Sauvegardée",
+    APPLIED: "Envoyée",
+    INTERVIEW: "Entretien",
+    OFFER: "Offre",
+    REJECTED: "Refusée",
+    WITHDRAWN: "Retirée",
+  };
+
+  return labels[status];
 }
 
 export default DashboardPage;
