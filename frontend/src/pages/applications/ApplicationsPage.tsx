@@ -1,26 +1,81 @@
-import { useEffect, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import {
   BriefcaseBusiness,
   CalendarClock,
+  ChevronLeft,
+  ChevronRight,
   ExternalLink,
   Heart,
   MapPin,
+  Search,
 } from "lucide-react";
-import { getJobApplications } from "../../api/job-applications";
-import type { JobApplication } from "../../types/job-application";
+import {
+  getJobApplications,
+  type FavoriteFilter,
+  type JobApplicationsSortBy,
+  type SortDirection,
+} from "../../api/job-applications";
+import type { ApplicationStatus, JobApplication } from "../../types/job-application";
 import type { PageResponse } from "../../types/pagination";
+
+const PAGE_SIZE = 10;
+
+const statusOptions: Array<{ label: string; value: ApplicationStatus | "ALL" }> = [
+  { label: "Tous les statuts", value: "ALL" },
+  { label: "Sauvegardée", value: "SAVED" },
+  { label: "Envoyée", value: "APPLIED" },
+  { label: "Entretien", value: "INTERVIEW" },
+  { label: "Offre", value: "OFFER" },
+  { label: "Refusée", value: "REJECTED" },
+  { label: "Retirée", value: "WITHDRAWN" },
+];
+
+const favoriteOptions: Array<{ label: string; value: FavoriteFilter }> = [
+  { label: "Toutes", value: "all" },
+  { label: "Favorites", value: "true" },
+  { label: "Non favorites", value: "false" },
+];
+
+const sortOptions: Array<{ label: string; value: JobApplicationsSortBy }> = [
+  { label: "Date de création", value: "createdAt" },
+  { label: "Dernière modification", value: "updatedAt" },
+  { label: "Entreprise", value: "companyName" },
+  { label: "Poste", value: "jobTitle" },
+  { label: "Statut", value: "status" },
+  { label: "Favori", value: "favorite" },
+];
 
 function ApplicationsPage() {
   const [applicationsPage, setApplicationsPage] =
     useState<PageResponse<JobApplication> | null>(null);
+
+  const [page, setPage] = useState(0);
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<ApplicationStatus | "ALL">("ALL");
+  const [favorite, setFavorite] = useState<FavoriteFilter>("all");
+  const [sortBy, setSortBy] = useState<JobApplicationsSortBy>("createdAt");
+  const [direction, setDirection] = useState<SortDirection>("desc");
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     async function loadApplications() {
       try {
+        setLoading(true);
         setError("");
-        const response = await getJobApplications();
+
+        const response = await getJobApplications({
+          page,
+          size: PAGE_SIZE,
+          search,
+          status,
+          favorite,
+          sortBy,
+          direction,
+        });
+
         setApplicationsPage(response);
       } catch {
         setError("Impossible de charger les candidatures.");
@@ -30,9 +85,27 @@ function ApplicationsPage() {
     }
 
     loadApplications();
-  }, []);
+  }, [page, search, status, favorite, sortBy, direction]);
+
+  function handleSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setPage(0);
+    setSearch(searchInput);
+  }
+
+  function handleResetFilters() {
+    setPage(0);
+    setSearchInput("");
+    setSearch("");
+    setStatus("ALL");
+    setFavorite("all");
+    setSortBy("createdAt");
+    setDirection("desc");
+  }
 
   const applications = applicationsPage?.content ?? [];
+  const currentPage = applicationsPage ? applicationsPage.page + 1 : 1;
+  const totalPages = applicationsPage?.totalPages ?? 1;
 
   return (
     <section>
@@ -43,8 +116,7 @@ function ApplicationsPage() {
           <h1 className="mt-2 text-3xl font-bold">Mes candidatures</h1>
 
           <p className="mt-3 max-w-2xl text-slate-400">
-            Consulte la liste de tes candidatures avec leur statut, leur date de
-            relance, leur entreprise et leur source.
+            Consulte, recherche, filtre et trie tes candidatures depuis une seule page.
           </p>
         </div>
 
@@ -56,6 +128,125 @@ function ApplicationsPage() {
             </p>
           </div>
         )}
+      </div>
+
+      <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-5">
+        <form onSubmit={handleSearch} className="grid gap-4 xl:grid-cols-[1.4fr_1fr_1fr_1fr_1fr_auto]">
+          <div>
+            <label className="mb-2 block text-sm text-slate-300">
+              Recherche
+            </label>
+
+            <div className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-950 px-4 py-3">
+              <Search size={17} className="text-slate-500" />
+
+              <input
+                className="w-full bg-transparent text-sm outline-none placeholder:text-slate-600"
+                placeholder="Entreprise, poste, ville, source..."
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm text-slate-300">
+              Statut
+            </label>
+
+            <select
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm outline-none"
+              value={status}
+              onChange={(event) => {
+                setPage(0);
+                setStatus(event.target.value as ApplicationStatus | "ALL");
+              }}
+            >
+              {statusOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm text-slate-300">
+              Favoris
+            </label>
+
+            <select
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm outline-none"
+              value={favorite}
+              onChange={(event) => {
+                setPage(0);
+                setFavorite(event.target.value as FavoriteFilter);
+              }}
+            >
+              {favoriteOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm text-slate-300">
+              Trier par
+            </label>
+
+            <select
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm outline-none"
+              value={sortBy}
+              onChange={(event) => {
+                setPage(0);
+                setSortBy(event.target.value as JobApplicationsSortBy);
+              }}
+            >
+              {sortOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm text-slate-300">
+              Ordre
+            </label>
+
+            <select
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm outline-none"
+              value={direction}
+              onChange={(event) => {
+                setPage(0);
+                setDirection(event.target.value as SortDirection);
+              }}
+            >
+              <option value="desc">Descendant</option>
+              <option value="asc">Ascendant</option>
+            </select>
+          </div>
+
+          <div className="flex items-end gap-2">
+            <button
+              className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold transition hover:bg-blue-500"
+              type="submit"
+            >
+              Rechercher
+            </button>
+
+            <button
+              className="rounded-xl border border-slate-700 px-4 py-3 text-sm text-slate-300 transition hover:border-slate-500 hover:text-white"
+              type="button"
+              onClick={handleResetFilters}
+            >
+              Reset
+            </button>
+          </div>
+        </form>
       </div>
 
       {loading && (
@@ -77,11 +268,11 @@ function ApplicationsPage() {
           </div>
 
           <h2 className="mt-4 text-xl font-semibold">
-            Aucune candidature pour le moment
+            Aucune candidature trouvée
           </h2>
 
           <p className="mt-2 text-sm text-slate-400">
-            Les candidatures créées depuis l’API apparaîtront ici.
+            Essaie de modifier la recherche ou les filtres.
           </p>
         </div>
       )}
@@ -176,9 +367,33 @@ function ApplicationsPage() {
         </div>
       )}
 
-      {applicationsPage && applicationsPage.totalPages > 1 && (
-        <div className="mt-5 rounded-2xl border border-slate-800 bg-slate-900 p-4 text-sm text-slate-400">
-          Page {applicationsPage.page + 1} sur {applicationsPage.totalPages}
+      {applicationsPage && (
+        <div className="mt-5 flex flex-col justify-between gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-4 text-sm text-slate-400 sm:flex-row sm:items-center">
+          <p>
+            Page {currentPage} sur {totalPages || 1}
+          </p>
+
+          <div className="flex gap-2">
+            <button
+              className="flex items-center gap-2 rounded-xl border border-slate-700 px-4 py-2 transition hover:border-slate-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              type="button"
+              disabled={applicationsPage.page === 0}
+              onClick={() => setPage((current) => Math.max(current - 1, 0))}
+            >
+              <ChevronLeft size={16} />
+              Précédent
+            </button>
+
+            <button
+              className="flex items-center gap-2 rounded-xl border border-slate-700 px-4 py-2 transition hover:border-slate-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              type="button"
+              disabled={applicationsPage.page + 1 >= applicationsPage.totalPages}
+              onClick={() => setPage((current) => current + 1)}
+            >
+              Suivant
+              <ChevronRight size={16} />
+            </button>
+          </div>
         </div>
       )}
     </section>
