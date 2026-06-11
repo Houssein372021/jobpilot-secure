@@ -357,11 +357,15 @@ public class JobApplicationService {
         JobApplication jobApplication = jobApplicationRepository.findByIdAndUserId(id, user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable"));
 
+        if (jobApplication.getStatus() == ApplicationStatus.REJECTED
+                || jobApplication.getStatus() == ApplicationStatus.WITHDRAWN) {
+            throw new IllegalArgumentException("Impossible de modifier la relance d'une candidature terminée");
+        }
+
         jobApplication.setFollowUpAt(request.followUpAt());
 
         JobApplication savedJobApplication = jobApplicationRepository.save(jobApplication);
 
         return toResponse(savedJobApplication);
     }
-
 }
