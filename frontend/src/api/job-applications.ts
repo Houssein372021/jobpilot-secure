@@ -84,3 +84,39 @@ export async function updateJobApplication(
   const response = await http.put<JobApplication>(`/job-applications/${id}`, request);
   return response.data;
 }
+
+export async function updateJobApplicationStatus(
+  id: string,
+  status: ApplicationStatus
+): Promise<JobApplication> {
+  const response = await http.patch<JobApplication>(
+    `/job-applications/${id}/status`,
+    { status }
+  );
+
+  return response.data;
+}
+
+export async function updateJobApplicationFavorite(
+  id: string,
+  favorite: boolean
+): Promise<JobApplication> {
+  const response = await http.patch<JobApplication>(
+    `/job-applications/${id}/favorite`,
+    { favorite }
+  );
+
+  return response.data;
+}
+
+export async function updateJobApplicationFollowUp(
+  id: string,
+  followUpAt: string | null
+): Promise<JobApplication> {
+  const response = await http.patch<JobApplication>(
+    `/job-applications/${id}/follow-up`,
+    { followUpAt }
+  );
+
+  return response.data;
+}

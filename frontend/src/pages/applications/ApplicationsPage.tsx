@@ -10,12 +10,17 @@ import {
   Search,
   Pencil,
   Plus,
+  Save,
 } from "lucide-react";
 import {
   getJobApplications,
+  updateJobApplicationFavorite,
+  updateJobApplicationFollowUp,
+  updateJobApplicationStatus,
   type FavoriteFilter,
   type JobApplicationsSortBy,
   type SortDirection,
+
 } from "../../api/job-applications";
 import type { ApplicationStatus, JobApplication } from "../../types/job-application";
 import type { PageResponse } from "../../types/pagination";
@@ -59,34 +64,45 @@ function ApplicationsPage() {
   const [favorite, setFavorite] = useState<FavoriteFilter>("all");
   const [sortBy, setSortBy] = useState<JobApplicationsSortBy>("createdAt");
   const [direction, setDirection] = useState<SortDirection>("desc");
+  const [quickFollowUps, setQuickFollowUps] = useState<Record<string, string>>({});
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    async function loadApplications() {
-      try {
-        setLoading(true);
-        setError("");
+  async function loadApplications() {
+    try {
+      setLoading(true);
+      setError("");
 
-        const response = await getJobApplications({
-          page,
-          size: PAGE_SIZE,
-          search,
-          status,
-          favorite,
-          sortBy,
-          direction,
-        });
+      const response = await getJobApplications({
+        page,
+        size: PAGE_SIZE,
+        search,
+        status,
+        favorite,
+        sortBy,
+        direction,
+      });
 
-        setApplicationsPage(response);
-      } catch {
-        setError("Impossible de charger les candidatures.");
-      } finally {
-        setLoading(false);
-      }
+      setApplicationsPage(response);
+
+      setQuickFollowUps(
+        Object.fromEntries(
+          response.content.map((application) => [
+            application.id,
+            toDateTimeLocalValue(application.followUpAt),
+          ])
+        )
+      );
+    } catch {
+      setError("Impossible de charger les candidatures.");
+    } finally {
+      setLoading(false);
     }
+  }
 
+  useEffect(() => {
     loadApplications();
   }, [page, search, status, favorite, sortBy, direction]);
 
@@ -106,6 +122,63 @@ function ApplicationsPage() {
     setDirection("desc");
   }
 
+  async function handleStatusChange(
+    application: JobApplication,
+    newStatus: ApplicationStatus
+  ) {
+    try {
+      setError("");
+      setUpdatingId(application.id);
+
+      await updateJobApplicationStatus(application.id, newStatus);
+      await loadApplications();
+    } catch {
+      setError("Impossible de modifier le statut.");
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
+  async function handleFavoriteToggle(application: JobApplication) {
+    try {
+      setError("");
+      setUpdatingId(application.id);
+
+      await updateJobApplicationFavorite(application.id, !application.favorite);
+      await loadApplications();
+    } catch {
+      setError("Impossible de modifier le favori.");
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
+  function handleQuickFollowUpChange(applicationId: string, value: string) {
+    setQuickFollowUps((current) => ({
+      ...current,
+      [applicationId]: value,
+    }));
+  }
+
+  async function handleFollowUpSave(application: JobApplication) {
+    try {
+      setError("");
+      setUpdatingId(application.id);
+
+      await updateJobApplicationFollowUp(
+        application.id,
+        emptyToNull(quickFollowUps[application.id] ?? "")
+      );
+
+      await loadApplications();
+    } catch {
+      setError("Impossible de modifier la date de relance.");
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
+
   const applications = applicationsPage?.content ?? [];
   const currentPage = applicationsPage ? applicationsPage.page + 1 : 1;
   const totalPages = applicationsPage?.totalPages ?? 1;
@@ -123,21 +196,24 @@ function ApplicationsPage() {
           </p>
         </div>
 
-        {applicationsPage && (
-          <div className="rounded-2xl border border-slate-800 bg-slate-900 px-5 py-4">
-            <p className="text-sm text-slate-400">Total</p>
-            <p className="mt-1 text-2xl font-bold">
-              {applicationsPage.totalElements}
-            </p>
-            <Link
-              to="/applications/new"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold transition hover:bg-blue-500"
-            >
-              <Plus size={16} />
-              Nouvelle candidature
-            </Link>
-          </div>
-        )}
+        <div className="flex flex-col gap-3 sm:items-end">
+          {applicationsPage && (
+            <div className="rounded-2xl border border-slate-800 bg-slate-900 px-5 py-4">
+              <p className="text-sm text-slate-400">Total</p>
+              <p className="mt-1 text-2xl font-bold">
+                {applicationsPage.totalElements}
+              </p>
+            </div>
+          )}
+
+          <Link
+            to="/applications/new"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold transition hover:bg-blue-500"
+          >
+            <Plus size={16} />
+            Nouvelle candidature
+          </Link>
+        </div>
       </div>
 
       <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-5">
@@ -289,7 +365,7 @@ function ApplicationsPage() {
 
       {!loading && !error && applications.length > 0 && (
         <div className="mt-8 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
-          <div className="hidden grid-cols-[1.4fr_1.2fr_0.8fr_1fr_0.8fr] gap-4 border-b border-slate-800 px-5 py-4 text-sm font-medium text-slate-400 lg:grid">
+          <div className="hidden grid-cols-[1.3fr_1.1fr_0.8fr_1fr_0.8fr_auto] gap-4 border-b border-slate-800 px-5 py-4 text-sm font-medium text-slate-400 lg:grid">
             <span>Entreprise</span>
             <span>Poste</span>
             <span>Statut</span>
@@ -372,13 +448,76 @@ function ApplicationsPage() {
                     </a>
                   )}
                 </div>
+                <div className="flex flex-col gap-2">
+                  <select
+                    className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm outline-none transition focus:border-blue-500"
+                    value={application.status}
+                    disabled={updatingId === application.id}
+                    onChange={(event) =>
+                      handleStatusChange(
+                        application,
+                        event.target.value as ApplicationStatus
+                      )
+                    }
+                  >
+                    {statusOptions
+                      .filter((option) => option.value !== "ALL")
+                      .map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                  </select>
+
+                  <button
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 px-3 py-2 text-sm text-slate-300 transition hover:border-red-500 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
+                    type="button"
+                    disabled={updatingId === application.id}
+                    onClick={() => handleFavoriteToggle(application)}
+                  >
+                    <Heart
+                      size={15}
+                      className={application.favorite ? "fill-red-500 text-red-500" : ""}
+                    />
+                    {application.favorite ? "Favori" : "Ajouter favori"}
+                  </button>
+
+                  <div className="flex gap-2">
+                    <input
+                      className="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm outline-none transition focus:border-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                      type="datetime-local"
+                      value={quickFollowUps[application.id] ?? ""}
+                      disabled={
+                        updatingId === application.id ||
+                        isTerminalStatus(application.status)
+                      }
+                      onChange={(event) =>
+                        handleQuickFollowUpChange(application.id, event.target.value)
+                      }
+                    />
+
+                    <button
+                      className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-3 py-2 text-sm font-semibold transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                      type="button"
+                      disabled={
+                        updatingId === application.id ||
+                        isTerminalStatus(application.status)
+                      }
+                      onClick={() => handleFollowUpSave(application)}
+                      title="Enregistrer la relance"
+                    >
+                      <Save size={15} />
+                    </button>
+                  </div>
+
                   <Link
                     to={`/applications/${application.id}/edit`}
-                    className="inline-flex items-center gap-2 rounded-xl border border-slate-700 px-3 py-2 text-sm text-slate-300 transition hover:border-blue-500 hover:text-blue-300"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 px-3 py-2 text-sm text-slate-300 transition hover:border-blue-500 hover:text-blue-300"
                   >
                     <Pencil size={15} />
                     Modifier
                   </Link>
+                </div>
 
               </article>
             ))}
@@ -437,6 +576,23 @@ function getStatusLabel(status: JobApplication["status"]) {
   };
 
   return labels[status];
+}
+
+function emptyToNull(value: string) {
+  const trimmedValue = value.trim();
+  return trimmedValue.length > 0 ? trimmedValue : null;
+}
+
+function toDateTimeLocalValue(value: string | null) {
+  if (!value) {
+    return "";
+  }
+
+  return value.slice(0, 16);
+}
+
+function isTerminalStatus(status: JobApplication["status"]) {
+  return status === "REJECTED" || status === "WITHDRAWN";
 }
 
 export default ApplicationsPage;
