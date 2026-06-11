@@ -362,6 +362,11 @@ public class JobApplicationService {
             throw new IllegalArgumentException("Impossible de modifier la relance d'une candidature terminée");
         }
 
+        if (request.followUpAt() != null
+                && request.followUpAt().isBefore(jobApplication.getCreatedAt())) {
+            throw new IllegalArgumentException("La date de relance ne peut pas être avant la date de création");
+        }
+
         jobApplication.setFollowUpAt(request.followUpAt());
 
         JobApplication savedJobApplication = jobApplicationRepository.save(jobApplication);
