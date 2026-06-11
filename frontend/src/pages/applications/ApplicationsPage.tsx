@@ -8,6 +8,8 @@ import {
   Heart,
   MapPin,
   Search,
+  Pencil,
+  Plus,
 } from "lucide-react";
 import {
   getJobApplications,
@@ -17,6 +19,7 @@ import {
 } from "../../api/job-applications";
 import type { ApplicationStatus, JobApplication } from "../../types/job-application";
 import type { PageResponse } from "../../types/pagination";
+import { Link } from "react-router-dom";
 
 const PAGE_SIZE = 10;
 
@@ -126,6 +129,13 @@ function ApplicationsPage() {
             <p className="mt-1 text-2xl font-bold">
               {applicationsPage.totalElements}
             </p>
+            <Link
+              to="/applications/new"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold transition hover:bg-blue-500"
+            >
+              <Plus size={16} />
+              Nouvelle candidature
+            </Link>
           </div>
         )}
       </div>
@@ -285,13 +295,14 @@ function ApplicationsPage() {
             <span>Statut</span>
             <span>Relance</span>
             <span>Source</span>
+            <span>Actions</span>
           </div>
 
           <div className="divide-y divide-slate-800">
             {applications.map((application) => (
               <article
                 key={application.id}
-                className="grid gap-4 px-5 py-5 lg:grid-cols-[1.4fr_1.2fr_0.8fr_1fr_0.8fr] lg:items-center"
+                className="grid gap-4 px-5 py-5 lg:grid-cols-[1.3fr_1.1fr_0.8fr_1fr_0.8fr_auto] lg:items-center"
               >
                 <div>
                   <div className="flex items-center gap-2">
@@ -361,6 +372,14 @@ function ApplicationsPage() {
                     </a>
                   )}
                 </div>
+                  <Link
+                    to={`/applications/${application.id}/edit`}
+                    className="inline-flex items-center gap-2 rounded-xl border border-slate-700 px-3 py-2 text-sm text-slate-300 transition hover:border-blue-500 hover:text-blue-300"
+                  >
+                    <Pencil size={15} />
+                    Modifier
+                  </Link>
+
               </article>
             ))}
           </div>

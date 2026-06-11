@@ -4,6 +4,7 @@ import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import ApplicationsPage from "./pages/applications/ApplicationsPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
+import ApplicationFormPage from "./pages/applications/ApplicationFormPage";
 
 function App() {
   return (
@@ -17,6 +18,8 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/applications" element={<ApplicationsPage />} />
+          <Route path="/applications/new" element={<ApplicationFormPage />} />
+          <Route path="/applications/:id/edit" element={<ApplicationFormPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
