@@ -1,33 +1,14 @@
 import { BriefcaseBusiness, LayoutDashboard, LogOut, ShieldCheck } from "lucide-react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { clearAuthStorage, getStoredUser } from "../utils/auth-storage";
 
-type StoredUser = {
-  firstName: string;
-  lastName: string;
-  email: string;
-};
-
-function getStoredUser(): StoredUser | null {
-  const storedUser = localStorage.getItem("user");
-
-  if (!storedUser) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(storedUser) as StoredUser;
-  } catch {
-    return null;
-  }
-}
 
 function MainLayout() {
   const navigate = useNavigate();
   const user = getStoredUser();
 
   function handleLogout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    clearAuthStorage();
     navigate("/login");
   }
 

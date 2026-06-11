@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../api/auth";
+import { saveAuthResponse } from "../../utils/auth-storage";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -22,8 +23,7 @@ function LoginPage() {
         password,
       });
 
-      localStorage.setItem("token", response.token);
-      localStorage.setItem("user", JSON.stringify(response));
+      saveAuthResponse(response);
 
       navigate("/dashboard");
     } catch {
